@@ -140,6 +140,10 @@ button:active {
   border-left: 1px solid var(--border);
 }
 
+.center_labeled {
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .form-container {

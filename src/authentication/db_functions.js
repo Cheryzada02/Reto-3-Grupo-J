@@ -13,3 +13,13 @@ export async function insert_into_user_profile (full_name, internal_email, passw
 
     return data
 }
+
+export async function login_user_profile (email, password) {
+    const {data, error} = await supabase.rpc("login_user", {
+    p_email: email,
+    p_password: password
+    })
+    if (error) throw error
+
+    return data
+}
