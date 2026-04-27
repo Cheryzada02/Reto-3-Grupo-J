@@ -20,13 +20,19 @@ export default function User_form() {
     }
   
     try {
-      const res = await login_user_profile(user_data.email, user_data.password)
-
-      if (res) {
-        set_result('Login Sucessfull!!')
+      if (localStorage.getItem(user_data.email)) {
+        set_result('Usuario Ya Logeado')
       }
       else {
-        set_result('Credenciales Incorrectas')
+        const res = await login_user_profile(user_data.email, user_data.password)
+
+        if (res) {
+          set_result('Login Sucessfull!!')
+          localStorage.setItem(user_data.email, JSON.stringify(user_data.email))
+        }
+        else {
+          set_result('Credenciales Incorrectas')
+        }
       }
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
