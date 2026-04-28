@@ -32,7 +32,6 @@ export default function User_form() {
     } finally {
       set_loading(false)
     }
-    
   }
 
   return (
