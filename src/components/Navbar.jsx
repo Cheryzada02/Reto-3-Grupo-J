@@ -8,6 +8,8 @@ export default function Navbar() {
       <nav>
         <Link to="/">Inicio</Link>
         <Link to="/servicio-cliente">Servicio al Cliente</Link>
+        <Link to="/suplidores">Suplidores</Link>
+        <Link to="/productos">Productos</Link>
       </nav>
     </header>
   );

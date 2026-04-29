@@ -60,3 +60,44 @@ export async function update_suppliers(id, name, phone, email, address) {
 
     return data
 }
+
+// View to See Products
+export async function get_products () {
+    const {data, error} = await supabase.from('view_products').select('*').range(0, 1)
+    if (error) throw error
+
+    return data
+}
+
+// Insert Products 
+export async function insert_into_products(name, description, supplier_id, cost_price, sale_price, current_stock, min_stock) {
+    const {data, error} = await supabase.rpc("insert_product", {
+    p_name: name,
+    p_description: description,
+    p_supplier_id: supplier_id,
+    p_cost: cost_price,
+    p_sale: sale_price,
+    p_stock: current_stock,
+    p_min: min_stock
+    })
+    if (error) throw error
+
+    return data
+}
+
+//Update Products
+export async function update_products(id, name, description, supplier_id, cost_price, sale_price, current_stock, min_stock) {
+    const {data, error} = await supabase.rpc("update_product", {
+    p_id: id,
+    p_name: name,
+    p_description: description,
+    p_supplier_id: supplier_id,
+    p_cost: cost_price,
+    p_sale: sale_price,
+    p_stock: current_stock,
+    p_min: min_stock
+    })
+    if (error) throw error
+
+    return data
+}
