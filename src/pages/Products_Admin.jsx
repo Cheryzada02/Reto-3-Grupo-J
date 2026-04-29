@@ -1,5 +1,7 @@
 import { get_products, insert_into_products, update_products, get_suppliers } from "../authentication/db_functions";
 import { useState, useEffect } from "react";
+import { upload_image } from "../authentication/db_functions";
+import { delete_image } from "../authentication/db_functions";
 
 function Product_card({ product, on_edit }) {
 
@@ -10,22 +12,27 @@ function Product_card({ product, on_edit }) {
     }).format(value);
   };
 
+
   return ( 
 
     <div className="product-card">
-      <div className="product-image">
-        📦
-      </div>
+    <div className="product-image">
+      {product.image_url ? (
+        <img src={product.image_url} alt={product.name} />
+      ) : (
+        <span>📦</span>
+      )}
+    </div>
 
-      <p className="product-title">{product.product_name}</p>
+      <p className="product-title"><strong>Nombre: </strong> {product.product_name}</p>
 
-      <p className="product-info">{product.description}</p>
-      <p className="product-info">{product.supplier_name}</p>
-      <p className="product-info">{formatCurrency(product.cost_price)}</p>
-      <p className="product-info">{formatCurrency(product.sale_price)}</p>
-      <p className="product-info">{product.current_stock}</p>
-      <p className="product-info">{product.min_stock}</p>
-      <p className="product-info">{product.status}</p>
+      <p className="product-info"> <strong>Descripcion: </strong> {product.description}</p>
+      <p className="product-info"><strong>Suplidor: </strong> {product.supplier_name}</p>
+      <p className="product-info"><strong>Precio Costo: </strong>{formatCurrency(product.cost_price)}</p>
+      <p className="product-info"><strong>Precio Venta: </strong>{formatCurrency(product.sale_price)}</p>
+      <p className="product-info"><strong>Stock: </strong>{product.current_stock}</p>
+      <p className="product-info"><strong>Stock Minimio: </strong>{product.min_stock}</p>
+      <p className="product-info"><strong>Status: </strong>{product.status}</p>
 
 
       <div className="product-actions">
@@ -63,11 +70,25 @@ function Product_Form({ product, on_save, on_close }) {
     cost_price: "", 
     sale_price: "", 
     current_stock: "", 
-    min_stock: ""
+    min_stock: "",
+    status: "",
+    image_url: ""
   });
 
   const [loading, set_loading] = useState(false)
   const [suppliers, set_suppliers] = useState([]);
+  const [product_status, set_status] = useState([]);
+  const [image_file, set_image_file] = useState(null);
+
+  useEffect(() => {
+    const data_status = [
+      { status: "Activo", label: "Activo" },
+      { status: "Inactivo", label: "Inactivo" },
+      { status: "Descontinuado", label: "Descontinuado" }
+    ];
+
+    set_status(data_status);
+  }, []);
 
 
   const load_suppliers = async () => {
@@ -84,12 +105,12 @@ function Product_Form({ product, on_save, on_close }) {
   }, []);
 
 
-
   useEffect(() => {
     if (product) {
       set_form(product);
     }
   }, [product]);
+
 
   const handle_change = (e) => {
     const { name, value } = e.target;
@@ -97,36 +118,45 @@ function Product_Form({ product, on_save, on_close }) {
       ...prev,
       [name]: value
     }));
+
+    
   };
 
   const handle_submit = async () => {
     if (!form.product_name.trim()) return alert("Nombre Es Requerido");
     if (!form.supplier_id) return alert("Suplidor Es Requerido");
-    if (Number(form.cost_price) <= 0) {
-      return alert("Costo debe ser mayor a 0");
-    }
 
-    if (Number(form.sale_price) <= 0) {
-      return alert("Precio de venta debe ser mayor a 0");
-    }
-
-    if (Number(form.current_stock) < 0) {
-      return alert("Inventario no puede ser negativo");
-    }
-
-    if (Number(form.min_stock) < 0) {
-      return alert("Inventario minimo no puede ser negativo");
-    }
+    if (Number(form.cost_price) <= 0) return alert("Costo debe ser mayor a 0");
+    if (Number(form.sale_price) <= 0) return alert("Precio de venta debe ser mayor a 0");
+    if (Number(form.current_stock) < 0) return alert("Inventario no puede ser negativo");
+    if (Number(form.min_stock) < 0) return alert("Inventario minimo no puede ser negativo");
+    if (!form.status) return alert("Estado Es Requerido");
 
     try {
-      set_loading(true)
-      await on_save(form);
+      set_loading(true);
+
+      let image_url = form.image_url;
+
+      if (image_file) {
+        image_url = await upload_image(image_file);
+
+        if (form.image_url) {
+          await delete_image(form.image_url);
+        }
+      }
+
+      const final_form = {
+        ...form,
+        image_url
+      };
+
+      await on_save(final_form);
       on_close();
+
     } catch (err) {
       console.error(err);
-    }
-    finally {
-      set_loading(false)
+    } finally {
+      set_loading(false);
     }
   };
 
@@ -155,6 +185,24 @@ function Product_Form({ product, on_save, on_close }) {
         <input name="sale_price" placeholder="Precio de Venta" value={form.sale_price} onChange={handle_change} />
         <input name="current_stock" placeholder="Inventario Actual" value={form.current_stock} onChange={handle_change} />
         <input name="min_stock" placeholder="Inventario Minimo" value={form.min_stock} onChange={handle_change} />
+
+        <select
+            name="status"
+            value={form.status}
+            onChange={handle_change} >
+          
+          <option value="">-- Seleccione un Estado --</option>
+          {product_status.map((s) => (
+            <option key={s.status} value={s.status}>
+              {s.label}
+            </option>
+          ))}
+        </select>
+
+        <input type="file" onChange={(e) => {
+          const file = e.target.files?.[0] || null;
+          set_image_file(file);
+        }}/>
 
         <div className="modal-actions">
           <button onClick={handle_submit} disabled={loading}>
@@ -189,15 +237,15 @@ export default function Products_page() {
   }, []); 
 
   const save_product = async (data) => {
-    console.log(data);
+
 
     try {
       if (data.product_id) {
-        const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock);
+        const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url);
         alert("Product Updated Sucessfully!")
       }
         else {
-        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock);
+        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url);
         alert("Product Added Successfully!");
       }
 

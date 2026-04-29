@@ -5,8 +5,8 @@ import Navbar from "./components/Navbar";
 import Navbar_Admin from "./components/Navbar_Admin";
 import Home from "./pages/Home";
 import CustomerService from "./pages/CustomerService";
-import SupplierPage from "./components/Suppliers_Admin";
-import ProductsPage from "./components/Products_Admin";
+import SupplierPage from "./pages/Suppliers_Admin";
+import ProductsPage from "./pages/Products_Admin";
 import User_form from "./components/testing2"; 
 import { useState, useEffect } from "react";
 
@@ -21,8 +21,6 @@ function App() {
     setUser(session);
   }
 }, []);
-
-  console.log(user)
 
   return (
     <BrowserRouter>

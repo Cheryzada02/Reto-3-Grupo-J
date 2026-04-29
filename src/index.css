@@ -60,6 +60,12 @@ body {
   font-size: 40px;
 }
 
+.product-image img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .product-title {
   font-weight: 600;
   margin: 10px 0;
