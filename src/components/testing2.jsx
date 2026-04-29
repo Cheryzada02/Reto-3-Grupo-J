@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import { login_user_profile } from '../authentication/db_functions'
+import { useNavigate } from 'react-router-dom';
 
 export default function User_form() {
+
+  const navigate = useNavigate();
 
   const [result, set_result] = useState(null)
   const [loading, set_loading] = useState(false)
@@ -28,7 +31,16 @@ export default function User_form() {
 
         if (res) {
           set_result('Login Sucessfull!!')
-          localStorage.setItem(user_data.email, JSON.stringify(user_data.email))
+          const session = {
+            role_id: res,
+            email: user_data.email
+          }
+
+          localStorage.setItem("session", JSON.stringify(session))
+
+          navigate("/");
+
+          window.location.reload();
         }
         else {
           set_result('Credenciales Incorrectas')
@@ -50,17 +62,17 @@ export default function User_form() {
     <div className="form-container">
       <div className="form-title">Iniciar Sesion</div>
 
-      <form onSubmit={capturar_boton_login}>
+      <form onSubmit={capturar_boton_login} className='modal'>
 
         <div className="form-group">
           <label>Email</label>
-          <div className="input-group">
+          <div className="modal input">
             <input type="text" name="email" placeholder="Nombre Usuario" required />
             <span className="input-suffix">@ferreteriard.com</span>
           </div>
         </div>
 
-        <div className="form-group">
+        <div className="modal input">
           <label>Contraseña</label>
           <input type="password" name="password" required />
         </div>

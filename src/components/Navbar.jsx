@@ -5,10 +5,11 @@ export default function Navbar() {
     <header className="navbar">
       <div className="logo">FerreteriaRD</div>
 
+      <Link to="/login"> <button>Login</button></Link>
+
       <nav>
         <Link to="/">Inicio</Link>
         <Link to="/servicio-cliente">Servicio al Cliente</Link>
-        <Link to="/suplidores">Suplidores</Link>
         <Link to="/productos">Productos</Link>
       </nav>
     </header>
