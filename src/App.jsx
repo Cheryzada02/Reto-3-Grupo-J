@@ -5,8 +5,8 @@ import Navbar from "./components/Navbar";
 import Navbar_Admin from "./components/Navbar_Admin";
 import Home from "./pages/Home";
 import CustomerService from "./pages/CustomerService";
-import SupplierPage from "./components/Testing_Supplier";
-import ProductsPage from "./components/Testing_Products";
+import SupplierPage from "./components/Suppliers_Admin";
+import ProductsPage from "./components/Products_Admin";
 import User_form from "./components/testing2"; 
 import { useState, useEffect } from "react";
 
