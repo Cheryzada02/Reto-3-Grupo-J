@@ -1,0 +1,154 @@
+.navbar {
+  width: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar-top,
+.navbar-main {
+  background-color: #2d2d2d;
+  color: white;
+}
+
+.navbar-top {
+  height: 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 11%;
+  font-size: 14px;
+}
+
+.navbar-contact {
+  display: flex;
+  gap: 25px;
+}
+
+.navbar-contact span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-faq {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.navbar-main {
+  height: 115px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 0 11%;
+}
+
+.navbar-logo {
+  color: white;
+  text-decoration: none;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.navbar-search {
+  flex: 1;
+  display: flex;
+  max-width: 600px;
+  height: 62px;
+}
+
+.navbar-search input {
+  flex: 1;
+  border: none;
+  padding: 0 24px;
+  font-size: 17px;
+  outline: none;
+}
+
+.navbar-search button {
+  width: 65px;
+  border: none;
+  background-color: #ff9815;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.navbar-action {
+  color: white;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.navbar-action span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.navbar-action strong {
+  font-size: 16px;
+}
+
+.cart {
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -15px;
+  left: 26px;
+  background-color: #ff9815;
+  color: white;
+  border-radius: 999px;
+  min-width: 38px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.navbar-menu {
+  height: 62px;
+  background-color: #ff9815;
+  display: flex;
+  align-items: center;
+  padding: 0 11%;
+  gap: 35px;
+}
+
+.navbar-menu a {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.departments {
+  width: 300px;
+  height: 62px;
+  background-color: white;
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  border-radius: 8px 8px 0 0;
+}
+
+.departments span {
+  color: #777;
+  font-size: 14px;
+}
