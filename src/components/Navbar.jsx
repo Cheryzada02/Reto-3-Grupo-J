@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {
   Search,
   User,
@@ -12,15 +12,16 @@ import "./Navbar.css";
 export default function Navbar() {
   return (
     <header className="navbar">
+      {/* TOP BAR */}
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
-            <Headphones size={18} />
+            <Headphones size={16} />
             (829) 123-0000
           </span>
 
           <span>
-            <Mail size={18} />
+            <Mail size={16} />
             soporteweb@FerreteriaRD.com.do
           </span>
         </div>
@@ -30,6 +31,7 @@ export default function Navbar() {
         </Link>
       </div>
 
+      {/* MAIN BAR */}
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
           FerreteriaRD
@@ -38,27 +40,27 @@ export default function Navbar() {
         <form className="navbar-search">
           <input type="text" placeholder="Buscar en la tienda..." />
           <button type="submit">
-            <Search size={24} />
+            <Search size={22} />
           </button>
         </form>
 
         <div className="navbar-actions">
           <Link to="/login" className="navbar-action">
-            <User size={32} />
+            <User size={28} />
             <span>
               Hola <strong>Acceder</strong>
             </span>
           </Link>
 
           <Link to="/favoritos" className="navbar-action">
-            <Heart size={28} />
+            <Heart size={26} />
             <span>
               Lista de <strong>favoritos</strong>
             </span>
           </Link>
 
           <Link to="/carrito" className="navbar-action cart">
-            <ShoppingCart size={28} />
+            <ShoppingCart size={26} />
             <span className="cart-count">0</span>
             <span>
               <strong>Carrito</strong>
@@ -67,17 +69,48 @@ export default function Navbar() {
         </div>
       </div>
 
+      {/* MENU */}
       <nav className="navbar-menu">
-        <div className="departments">
+        <div className="menu-department">
           <strong>Departamentos</strong>
           <span>Ver todos</span>
         </div>
 
-        <Link to="/">Inicio</Link>
-        <Link to="/ofertas">Ofertas</Link>
-        <Link to="/marcas">Marcas</Link>
-        <Link to="/servicio-cliente">Servicio al cliente</Link>
-        <Link to="/productos">Productos</Link>
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Inicio
+        </NavLink>
+
+        <NavLink
+          to="/ofertas"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Ofertas
+        </NavLink>
+
+        <NavLink
+          to="/marcas"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Marcas
+        </NavLink>
+
+        <NavLink
+          to="/servicio-cliente"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Servicio al cliente
+        </NavLink>
+
+        <NavLink
+          to="/productos"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Productos
+        </NavLink>
       </nav>
     </header>
   );
