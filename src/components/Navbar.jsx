@@ -1,4 +1,5 @@
-import { NavLink, Link } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   Search,
   User,
@@ -6,13 +7,32 @@ import {
   ShoppingCart,
   Mail,
   Headphones,
+  ChevronDown,
 } from "lucide-react";
+
+import { departamentos } from "../data/departamentos";
 import "./Navbar.css";
 
 export default function Navbar() {
+  const [showDepartments, setShowDepartments] = useState(false);
+  const navigate = useNavigate();
+
+  const toggleDepartments = () => {
+    setShowDepartments((prev) => !prev);
+  };
+
+  const closeDepartments = () => {
+    setShowDepartments(false);
+  };
+
+  const handleViewAllProducts = (e) => {
+    e.stopPropagation();
+    setShowDepartments(false);
+    navigate("/productos");
+  };
+
   return (
     <header className="navbar">
-      {/* TOP BAR */}
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
@@ -31,7 +51,6 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* MAIN BAR */}
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
           FerreteriaRD
@@ -69,11 +88,34 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* MENU */}
       <nav className="navbar-menu">
-        <div className="menu-department">
-          <strong>Departamentos</strong>
-          <span>Ver todos</span>
+        <div className="department-wrapper">
+          <button
+            type="button"
+            className="menu-department"
+            onClick={toggleDepartments}
+          >
+            <strong>Departamentos</strong>
+
+            <span onClick={handleViewAllProducts}>
+              Ver todos
+              <ChevronDown size={16} />
+            </span>
+          </button>
+
+          {showDepartments && (
+            <div className="department-dropdown">
+              {departamentos.map((departamento) => (
+                <Link
+                  key={departamento.id}
+                  to={departamento.ruta}
+                  onClick={closeDepartments}
+                >
+                  {departamento.nombre}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         <NavLink
