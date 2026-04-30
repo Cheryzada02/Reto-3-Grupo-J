@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { login_user_profile } from '../authentication/db_functions'
 import { useNavigate } from 'react-router-dom';
 
-export default function User_form() {
+export default function Login() {
 
   const navigate = useNavigate();
 

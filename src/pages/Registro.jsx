@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { insert_into_user_profile } from '../authentication/db_functions'
 
-export default function User_form() {
+export default function Registro() {
 
   const [result, set_result] = useState(null)
   const [loading, set_loading] = useState(false)
