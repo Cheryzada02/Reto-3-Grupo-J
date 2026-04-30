@@ -159,3 +159,26 @@ export async function delete_image(image_url) {
 
   return data;
 }
+
+// View to See Inventory_Movements
+export async function get_inventory_movements () {
+    const {data, error} = await supabase.from('view_inventory_movements').select('*')
+    if (error) throw error
+
+    return data
+}
+
+// Insert Inventory_Movements 
+export async function insert_inventory_movement(product_id, user_id, movement_type, quantity, reference, notes) {
+    const {data, error} = await supabase.rpc("insert_inventory_movement", {
+    p_product_id: product_id,
+    p_user_id: user_id,
+    p_movement_type: movement_type,
+    p_quantity: quantity,
+    p_reference: reference,
+    p_notes: notes
+    })
+    if (error) throw error
+
+    return data
+}

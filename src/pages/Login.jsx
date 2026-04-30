@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react'
-import { insert_into_user_profile } from '../authentication/db_functions'
+import { login_user_profile } from '../authentication/db_functions'
+import { useNavigate } from 'react-router-dom';
 
-export default function User_form() {
+export default function Login() {
+
+  const navigate = useNavigate();
 
   const [result, set_result] = useState(null)
   const [loading, set_loading] = useState(false)
   
-  const capturar_boton_registro = async (e) => {
+  const capturar_boton_login = async (e) => {
     e.preventDefault();
 
     set_loading(true)
@@ -15,50 +18,69 @@ export default function User_form() {
     const user_name = form_data.get("email")
 
     const user_data = {
-      full_name: form_data.get('full_name'),
       email: `${user_name}@ferreteriard.com`,
       password: form_data.get('password')
     }
   
     try {
-      const res = await insert_into_user_profile(user_data.full_name, user_data.email, user_data.password, 3)
-      set_result('Usuario Registrado')
+      if (localStorage.getItem(user_data.email)) {
+        set_result('Usuario Ya Logeado')
+      }
+      else {
+        const res = await login_user_profile(user_data.email, user_data.password)
+
+        if (res) {
+          set_result('Login Sucessfull!!')
+          const session = {
+            role_id: res.role_id,
+            email: user_data.email,
+            user_id: res.user_id,
+            user_name: res.user_name
+          }
+
+          localStorage.setItem("session", JSON.stringify(session))
+
+          navigate("/");
+
+          window.location.reload();
+        }
+        else {
+          set_result('Credenciales Incorrectas')
+        }
+      }
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        set_result("El Usuario Ya Existe En La Base De Datos.")
+        set_result("Usuario Registrado")
       } else {
         set_result(err.message)
       }
     } finally {
       set_loading(false)
     }
+    
   }
 
   return (
     <div className="form-container">
-      <div className="form-title">Create Account</div>
+      <div className="form-title">Iniciar Sesion</div>
 
-      <form onSubmit={capturar_boton_registro}>
-        <div className="form-group">
-          <label>Nombre Completo</label>
-          <input type="text" name="full_name" required />
-        </div>
+      <form onSubmit={capturar_boton_login} className='modal'>
 
         <div className="form-group">
           <label>Email</label>
-          <div className="input-group">
+          <div className="modal input">
             <input type="text" name="email" placeholder="Nombre Usuario" required />
             <span className="input-suffix">@ferreteriard.com</span>
           </div>
         </div>
 
-        <div className="form-group">
+        <div className="modal input">
           <label>Contraseña</label>
           <input type="password" name="password" required />
         </div>
 
         <button type="submit" disabled={loading}>
-          {loading ? "Creando..." : "Crear Cuenta"}
+          {loading ? "Logging..." : "Submit"}
         </button>
 
         <label className='center_labeled'> {result}</label>

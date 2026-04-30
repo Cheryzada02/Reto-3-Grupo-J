@@ -7,21 +7,15 @@ import Home from "./pages/Home";
 import CustomerService from "./pages/CustomerService";
 import SupplierPage from "./pages/Suppliers_Admin";
 import ProductsPage from "./pages/Products_Admin";
-import User_form from "./components/testing2"; 
+import Login from "./pages/Login"; 
 import { useState, useEffect } from "react";
 import ProductosPagina from "./pages/Productos";
+import Inventory_movements from "./pages/Inventory_Movements_Admin";
+import { useAuth } from  "./authentication/AuthContext";
 
 function App() {
 
-  const [user, setUser] = useState(null)
-  
-  useEffect(() => {
-  const session = JSON.parse(localStorage.getItem("session"));
-
-  if (session) {
-    setUser(session);
-  }
-}, []);
+  const { user } = useAuth();
 
   return (
     <BrowserRouter>
@@ -33,6 +27,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<ProductsPage />} />
             <Route path="/suplidores" element={<SupplierPage />} />
+            <Route path="/inventory_movements" element={<Inventory_movements />} />
             <Route path="/servicio-cliente" element={<CustomerService />} />
           </Routes>
         </>
@@ -42,7 +37,7 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<User_form />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/servicio-cliente" element={<CustomerService />} />
             <Route path="/productos" element={<ProductsPage />} />
             <Route path="*" element={<Home />} />
