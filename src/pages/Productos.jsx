@@ -1,4 +1,6 @@
+import { Heart } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useFavorites } from "../context/FavoritesContext";
 
 const productos = [
   {
@@ -53,6 +55,7 @@ const productos = [
 
 function ProductosPagina() {
   const { addToCart } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-DO", {
@@ -66,28 +69,45 @@ function ProductosPagina() {
       <h2>Productos Destacados</h2>
 
       <div className="contenedor">
-        {productos.map((producto) => (
-          <div className="card" key={producto.product_id}>
-            <img src={producto.image_url} alt={producto.product_name} />
+        {productos.map((producto) => {
+          const favorito = isFavorite(producto.product_id);
 
-            <div className="card-body">
-              <h3>{producto.product_name}</h3>
-              <p>{producto.description}</p>
-
-              <div className="precio">
-                {formatCurrency(producto.sale_price)}
-              </div>
-
+          return (
+            <div className="card" key={producto.product_id}>
               <button
                 type="button"
-                className="btn"
-                onClick={() => addToCart(producto)}
+                className={favorito ? "favorite-button active" : "favorite-button"}
+                onClick={() => toggleFavorite(producto)}
+                aria-label={
+                  favorito
+                    ? "Quitar de favoritos"
+                    : "Agregar a favoritos"
+                }
               >
-                Agregar al carrito
+                <Heart size={18} />
               </button>
+
+              <img src={producto.image_url} alt={producto.product_name} />
+
+              <div className="card-body">
+                <h3>{producto.product_name}</h3>
+                <p>{producto.description}</p>
+
+                <div className="precio">
+                  {formatCurrency(producto.sale_price)}
+                </div>
+
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => addToCart(producto)}
+                >
+                  Agregar al carrito
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
