@@ -168,7 +168,6 @@ textarea:focus {
 .product-title,
 .articulo-card h2 {
   color: var(--color-navy);
-  font-weight: 800;
 }
 
 .product-info,
