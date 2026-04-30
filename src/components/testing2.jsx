@@ -32,8 +32,10 @@ export default function User_form() {
         if (res) {
           set_result('Login Sucessfull!!')
           const session = {
-            role_id: res,
-            email: user_data.email
+            role_id: res.role_id,
+            email: user_data.email,
+            user_id: res.user_id,
+            user_name: res.user_name
           }
 
           localStorage.setItem("session", JSON.stringify(session))

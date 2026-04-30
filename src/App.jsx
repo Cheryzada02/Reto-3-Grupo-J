@@ -10,18 +10,12 @@ import ProductsPage from "./pages/Products_Admin";
 import User_form from "./components/testing2"; 
 import { useState, useEffect } from "react";
 import ProductosPagina from "./pages/Productos";
+import Inventory_movements from "./pages/Inventory_Movements_Admin";
+import { useAuth } from  "./authentication/AuthContext";
 
 function App() {
 
-  const [user, setUser] = useState(null)
-  
-  useEffect(() => {
-  const session = JSON.parse(localStorage.getItem("session"));
-
-  if (session) {
-    setUser(session);
-  }
-}, []);
+  const { user } = useAuth();
 
   return (
     <BrowserRouter>
@@ -33,6 +27,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/productos" element={<ProductsPage />} />
             <Route path="/suplidores" element={<SupplierPage />} />
+            <Route path="/inventory_movements" element={<Inventory_movements />} />
             <Route path="/servicio-cliente" element={<CustomerService />} />
           </Routes>
         </>
