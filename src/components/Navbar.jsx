@@ -11,6 +11,7 @@ export default function Navbar() {
         <Link to="/">Inicio</Link>
         <Link to="/servicio-cliente">Servicio al Cliente</Link>
         <Link to="/productos">Productos</Link>
+        <Link to="/productoscliente">Productos</Link>
       </nav>
     </header>
   );

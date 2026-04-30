@@ -9,6 +9,7 @@ import SupplierPage from "./pages/Suppliers_Admin";
 import ProductsPage from "./pages/Products_Admin";
 import User_form from "./components/testing2"; 
 import { useState, useEffect } from "react";
+import ProductosPagina from "./pages/Productos";
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
             <Route path="/servicio-cliente" element={<CustomerService />} />
             <Route path="/productos" element={<ProductsPage />} />
              <Route path="*" element={<Home />} />
+             <Route path="/productoscliente" element={<ProductosPagina />} />
           </Routes>
         </>
       )}
