@@ -11,11 +11,14 @@ import {
 } from "lucide-react";
 
 import { departamentos } from "../data/departamentos";
+import { useCart } from "../context/CartContext";
 import "./Navbar.css";
 
 export default function Navbar() {
   const [showDepartments, setShowDepartments] = useState(false);
   const navigate = useNavigate();
+
+  const { cartCount } = useCart();
 
   const toggleDepartments = () => {
     setShowDepartments((prev) => !prev);
@@ -42,7 +45,7 @@ export default function Navbar() {
 
           <span>
             <Mail size={16} />
-            soporteweb@FerreteriaRD.com.do
+            soporteweb@ferreteriaelupina.com.do
           </span>
         </div>
 
@@ -53,7 +56,7 @@ export default function Navbar() {
 
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
-          FerreteriaRD
+          Ferreteria Elupina
         </Link>
 
         <form className="navbar-search">
@@ -80,7 +83,9 @@ export default function Navbar() {
 
           <Link to="/carrito" className="navbar-action cart">
             <ShoppingCart size={26} />
-            <span className="cart-count">0</span>
+
+            <span className="cart-count">{cartCount}</span>
+
             <span>
               <strong>Carrito</strong>
             </span>

@@ -22,7 +22,7 @@ export default function Navbar_Admin() {
 
           <span>
             <Mail size={16} />
-            soporteweb@FerreteriaRD.com.do
+            soporteweb@Ferreteriaelupina.com.do
           </span>
         </div>
 
@@ -34,7 +34,7 @@ export default function Navbar_Admin() {
       {/* MAIN BAR */}
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
-          FerreteriaRD Admin
+          Ferreteria Elupina Admin
         </Link>
 
         <form className="navbar-search">

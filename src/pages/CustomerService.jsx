@@ -10,21 +10,38 @@ export default function CustomerService() {
   });
 
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+  }
+
+  function validateForm() {
+    if (!formData.name.trim()) return "El nombre es obligatorio.";
+    if (!formData.email.includes("@")) return "Correo inválido.";
+    if (!formData.message.trim()) return "El mensaje es obligatorio.";
+
+    return null;
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
 
+    const validationError = validateForm();
+
+    if (validationError) {
+      setStatus(validationError);
+      return;
+    }
+
     try {
-      setStatus("Enviando...");
+      setLoading(true);
+      setStatus("Enviando solicitud...");
 
       await sendCustomerRequest(formData);
 
@@ -37,8 +54,10 @@ export default function CustomerService() {
         message: "",
       });
     } catch (error) {
-      setStatus("No se pudo enviar la solicitud.");
-      console.error(error);
+      setStatus("Error al enviar la solicitud. Intenta nuevamente.");
+      console.error("CustomerService error:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -47,7 +66,7 @@ export default function CustomerService() {
       <h1>Servicio al Cliente</h1>
 
       <p>
-        Escríbenos y nuestro equipo de FerreteriaRD te responderá lo antes
+        Escríbenos y nuestro equipo de Ferretería Elupina te responderá lo antes
         posible.
       </p>
 
@@ -94,7 +113,9 @@ export default function CustomerService() {
           />
         </label>
 
-        <button type="submit">Enviar solicitud</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Enviando..." : "Enviar solicitud"}
+        </button>
 
         {status && <p className="status">{status}</p>}
       </form>

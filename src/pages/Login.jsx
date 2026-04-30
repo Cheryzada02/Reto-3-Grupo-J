@@ -1,91 +1,125 @@
-import { useState, useEffect } from 'react'
-import { login_user_profile } from '../authentication/db_functions'
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Lock, User, AlertCircle } from "lucide-react";
+
+import { login_user_profile } from "../authentication/db_functions";
 
 export default function Login() {
-
   const navigate = useNavigate();
 
-  const [result, set_result] = useState(null)
-  const [loading, set_loading] = useState(false)
-  
-  const capturar_boton_login = async (e) => {
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    set_loading(true)
+    setResult("");
+    setLoading(true);
 
-    const form_data = new FormData(e.currentTarget);
-    const user_name = form_data.get("email")
+    const formData = new FormData(e.currentTarget);
 
-    const user_data = {
-      email: `${user_name}@ferreteriard.com`,
-      password: form_data.get('password')
-    }
-  
+    const username = formData.get("email")?.trim();
+    const password = formData.get("password");
+
+    const userData = {
+      email: `${username}@ferreteriard.com`,
+      password,
+    };
+
     try {
-      if (localStorage.getItem(user_data.email)) {
-        set_result('Usuario Ya Logeado')
+      const res = await login_user_profile(userData.email, userData.password);
+
+      if (!res) {
+        setResult("Credenciales incorrectas.");
+        return;
       }
-      else {
-        const res = await login_user_profile(user_data.email, user_data.password)
 
-        if (res) {
-          set_result('Login Sucessfull!!')
-          const session = {
-            role_id: res.role_id,
-            email: user_data.email,
-            user_id: res.user_id,
-            user_name: res.user_name
-          }
+      const session = {
+        role_id: res.role_id,
+        email: userData.email,
+        user_id: res.user_id,
+        user_name: res.user_name,
+      };
 
-          localStorage.setItem("session", JSON.stringify(session))
+      localStorage.setItem("session", JSON.stringify(session));
 
-          navigate("/");
-
-          window.location.reload();
-        }
-        else {
-          set_result('Credenciales Incorrectas')
-        }
-      }
+      navigate("/");
+      window.location.reload();
     } catch (err) {
-      if (err.message.includes("duplicate key value")) {
-        set_result("Usuario Registrado")
-      } else {
-        set_result(err.message)
-      }
+      setResult("No se pudo iniciar sesión. Intenta nuevamente.");
+      console.error(err.message);
     } finally {
-      set_loading(false)
+      setLoading(false);
     }
-    
-  }
+  };
 
   return (
-    <div className="form-container">
-      <div className="form-title">Iniciar Sesion</div>
+    <main className="login-page">
+      <section className="login-card">
+        <div className="login-header">
+          <span className="login-icon">
+            <Lock size={28} />
+          </span>
 
-      <form onSubmit={capturar_boton_login} className='modal'>
+          <h1>Iniciar sesión</h1>
 
-        <div className="form-group">
-          <label>Email</label>
-          <div className="modal input">
-            <input type="text" name="email" placeholder="Nombre Usuario" required />
-            <span className="input-suffix">@ferreteriard.com</span>
+          <p>
+            Accede con tu usuario empresarial para continuar en Ferretería
+            Elupina.
+          </p>
+        </div>
+
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="login-group">
+            <label htmlFor="email">Usuario</label>
+
+            <div className="login-input-wrapper">
+              <User size={18} />
+              <input
+                id="email"
+                type="text"
+                name="email"
+                placeholder="Nombre de usuario"
+                required
+              />
+              <span>@ferreteriaelupina.com</span>
+            </div>
           </div>
-        </div>
 
-        <div className="modal input">
-          <label>Contraseña</label>
-          <input type="password" name="password" required />
-        </div>
+          <div className="login-group">
+            <label htmlFor="password">Contraseña</label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging..." : "Submit"}
-        </button>
+            <div className="login-input-wrapper">
+              <Lock size={18} />
+              <input
+                id="password"
+                type="password"
+                name="password"
+                placeholder="Tu contraseña"
+                required
+              />
+            </div>
+          </div>
 
-        <label className='center_labeled'> {result}</label>
-      </form>
-    </div>
+          {result && (
+            <div className="login-message">
+              <AlertCircle size={18} />
+              <span>{result}</span>
+            </div>
+          )}
 
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? "Validando..." : "Entrar"}
+          </button>
+
+          {/* LINK A REGISTRO */}
+          <div className="login-footer">
+            <a href="/registro" className="login-link">
+              ¿No tienes cuenta? Crear cuenta
+            </a>
+          </div>
+        </form>
+      </section>
+    </main>
   );
 }
