@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Truck,
+  Store,
+  CreditCard,
+  Hammer,
+  PaintBucket,
+  Wrench,
+  ShieldCheck,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const slides = [
   {
@@ -15,16 +26,34 @@ const slides = [
       "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80",
     title: "Materiales de construcción",
     text: "Todo lo que necesitas para trabajar con seguridad y calidad.",
-    button: "Conocer más",
-    link: "/servicio-cliente",
+    button: "Explorar tienda",
+    link: "/productos",
   },
   {
     image:
       "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1400&q=80",
     title: "Retiro en tienda",
     text: "Compra tus productos y retíralos directamente en nuestra ferretería.",
-    button: "Preguntas frecuentes",
+    button: "Ver preguntas frecuentes",
     link: "/faq",
+  },
+];
+
+const categories = [
+  {
+    title: "Herramientas",
+    text: "Taladros, martillos, llaves y equipos de trabajo.",
+    icon: Hammer,
+  },
+  {
+    title: "Pintura",
+    text: "Pinturas, brochas, rodillos y accesorios.",
+    icon: PaintBucket,
+  },
+  {
+    title: "Plomería",
+    text: "Tuberías, conexiones, llaves y reparaciones.",
+    icon: Wrench,
   },
 ];
 
@@ -55,21 +84,19 @@ export default function Home() {
   const slide = slides[currentSlide];
 
   return (
-    <section className="home">
+    <main className="home">
       <section className="home-slider">
         <img src={slide.image} alt={slide.title} className="slider-image" />
 
         <div className="slider-overlay">
           <div className="slider-content">
-            <span className="slider-label">Ferreteria Elupina</span>
-
+            <span className="slider-label">Ferretería Elupina</span>
             <h1>{slide.title}</h1>
-
             <p>{slide.text}</p>
 
-            <a href={slide.link} className="slider-button">
+            <Link to={slide.link} className="slider-button">
               {slide.button}
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -104,22 +131,74 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="cards">
-        <article className="card">
-          <h2>Herramientas</h2>
-          <p>Taladros, martillos, sierras, llaves y más.</p>
+      <section className="home-benefits">
+        <article>
+          <Store size={30} />
+          <div>
+            <h3>Retiro en tienda</h3>
+            <p>Compra online y recoge tus productos en la ferretería.</p>
+          </div>
         </article>
 
-        <article className="card">
-          <h2>Construcción</h2>
-          <p>Cemento, pintura, tuberías, electricidad y materiales.</p>
+        <article>
+          <CreditCard size={30} />
+          <div>
+            <h3>Pago fácil</h3>
+            <p>Aceptamos efectivo y transferencias bancarias.</p>
+          </div>
         </article>
 
-        <article className="card">
-          <h2>Asesoría</h2>
-          <p>Te ayudamos a elegir el producto correcto.</p>
+        <article>
+          <ShieldCheck size={30} />
+          <div>
+            <h3>Compra segura</h3>
+            <p>Productos verificados y atención personalizada.</p>
+          </div>
+        </article>
+
+        <article>
+          <Truck size={30} />
+          <div>
+            <h3>Sin delivery</h3>
+            <p>Actualmente trabajamos solo con Pick Up.</p>
+          </div>
         </article>
       </section>
-    </section>
+
+      <section className="home-section-header">
+        <span>Compra por categoría</span>
+        <h2>Todo para construcción, reparación y mantenimiento</h2>
+      </section>
+
+      <section className="home-categories">
+        {categories.map((category) => {
+          const Icon = category.icon;
+
+          return (
+            <article className="home-category-card" key={category.title}>
+              <Icon size={38} />
+              <h3>{category.title}</h3>
+              <p>{category.text}</p>
+
+              <Link to="/productos">Ver productos</Link>
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="home-cta">
+        <div>
+          <span>Ferretería Elupina</span>
+          <h2>¿Necesitas ayuda para elegir un producto?</h2>
+          <p>
+            Nuestro equipo puede orientarte antes de realizar tu compra.
+          </p>
+        </div>
+
+        <Link to="/servicio-cliente" className="home-cta-button">
+          Contactar servicio al cliente
+        </Link>
+      </section>
+    </main>
   );
 }
