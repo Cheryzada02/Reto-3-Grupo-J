@@ -6,10 +6,35 @@ import {
   Headphones,
   LogOut,
 } from "lucide-react";
+import { useAuth } from  "../context/AuthContext";
+
 
 import "./Navbar.css";
 
 export default function Navbar_Admin() {
+
+  const { user, logout } = useAuth();
+  
+  
+  let login;
+  let user_name;
+  let class_when_login;
+
+  if (user?.role_id) {
+    login = "/";
+    user_name = user.user_name;
+    class_when_login = "navbar-action";
+  } else {
+    login = "/login";
+    user_name = "Acceder";
+    class_when_login = "hide";
+  }
+
+  const handle_log_out = () => {
+    logout();
+    navigate("/")
+  }
+
   return (
     <header className="navbar">
       {/* TOP BAR */}
@@ -38,26 +63,27 @@ export default function Navbar_Admin() {
         </Link>
 
         <form className="navbar-search">
-          <input type="text" placeholder="Buscar productos..." />
+          <input type="text" placeholder="Buscar en la tienda..." />
           <button type="submit">
             <Search size={22} />
           </button>
         </form>
 
         <div className="navbar-actions">
-          <div className="navbar-action">
+          <Link to={login} className="navbar-action">
             <User size={28} />
             <span>
-              Panel <strong>Administrador</strong>
+              Hola <strong>{user_name}</strong>
             </span>
-          </div>
+          </Link>
 
-          <Link to="/login" className="navbar-action">
+          <button onClick={handle_log_out} className={class_when_login}>
             <LogOut size={26} />
             <span>
               <strong>Salir</strong>
             </span>
-          </Link>
+          </button>
+
         </div>
       </div>
 

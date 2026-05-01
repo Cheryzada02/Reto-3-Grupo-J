@@ -31,17 +31,17 @@ export default function Registro() {
       setLoading(false);
       return;
     }
-
+    
     if (password.length < 6) {
       setResult("La contraseña debe tener al menos 6 caracteres.");
       setLoading(false);
       return;
     }
 
-    const email = `${username}@ferreteriard.com`;
+    const email = `${username}@ferreteriaelupina.com`;
 
     try {
-      await insert_into_user_profile(fullName, email, password, 3);
+      await insert_into_user_profile(fullName, email, password);
 
       const loggedUser = await login_user_profile(email, password);
 
@@ -60,7 +60,9 @@ export default function Registro() {
       localStorage.setItem("session", JSON.stringify(session));
 
       navigate("/");
+
       window.location.reload();
+
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
         setResult("Este usuario ya existe.");

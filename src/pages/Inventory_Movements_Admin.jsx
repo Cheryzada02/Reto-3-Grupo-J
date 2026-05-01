@@ -3,7 +3,7 @@ import {
   insert_inventory_movement,
   get_products,
 } from "../authentication/db_functions";
-import { useAuth } from  "../authentication/AuthContext";
+import { useAuth } from  "../context/AuthContext";
 
 import { useState, useEffect } from "react";
 

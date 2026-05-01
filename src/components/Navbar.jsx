@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   Search,
@@ -8,13 +8,33 @@ import {
   Mail,
   Headphones,
   ChevronDown,
+  LogOut,
 } from "lucide-react";
 
 import { departamentos } from "../data/departamentos";
 import { useCart } from "../context/CartContext";
+import { useAuth } from  "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar() {
+
+  const { user, logout } = useAuth();
+  
+  let login;
+  let user_name;
+  let class_when_login;
+
+  if (user?.role_id) {
+    login = "/";
+    user_name = user.user_name;
+    class_when_login = "navbar-action";
+  } else {
+    login = "/login";
+    user_name = "Acceder";
+    class_when_login = "hide";
+  }
+
+
   const [showDepartments, setShowDepartments] = useState(false);
   const navigate = useNavigate();
 
@@ -33,6 +53,11 @@ export default function Navbar() {
     setShowDepartments(false);
     navigate("/productos");
   };
+
+  const handle_log_out = () => {
+    logout();
+    navigate("/")
+  }
 
   return (
     <header className="navbar">
@@ -67,10 +92,10 @@ export default function Navbar() {
         </form>
 
         <div className="navbar-actions">
-          <Link to="/login" className="navbar-action">
+          <Link to={login} className="navbar-action">
             <User size={28} />
             <span>
-              Hola <strong>Acceder</strong>
+              Hola <strong>{user_name}</strong>
             </span>
           </Link>
 
@@ -90,6 +115,14 @@ export default function Navbar() {
               <strong>Carrito</strong>
             </span>
           </Link>
+
+          <button onClick={handle_log_out} className={class_when_login}>
+            <LogOut size={26} />
+            <span>
+              <strong>Salir</strong>
+            </span>
+          </button>
+
         </div>
       </div>
 

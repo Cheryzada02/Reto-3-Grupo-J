@@ -2,7 +2,7 @@ import { get_products, insert_into_products, update_products, get_suppliers, ins
 import { useState, useEffect } from "react";
 import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
-import { useAuth } from  "../authentication/AuthContext";
+import { useAuth } from  "../context/AuthContext";
 
 function Product_card({ product, on_edit }) {
 

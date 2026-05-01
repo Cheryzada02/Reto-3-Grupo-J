@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Lock, User, AlertCircle } from "lucide-react";
-
 import { login_user_profile } from "../authentication/db_functions";
 
 export default function Login() {
@@ -22,7 +21,7 @@ export default function Login() {
     const password = formData.get("password");
 
     const userData = {
-      email: `${username}@ferreteriard.com`,
+      email: `${username}@ferreteriaelupina.com`,
       password,
     };
 

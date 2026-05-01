@@ -111,6 +111,7 @@
 }
 
 .navbar-action {
+  background-color: transparent;
   display: flex;
   align-items: center;
   gap: 7px;
@@ -121,6 +122,7 @@
 
 .navbar-action:hover {
   color: var(--color-secondary-light);
+  background-color: transparent;
 }
 
 .navbar-action span {
@@ -261,6 +263,10 @@
 .view-all-departments:hover {
   background-color: var(--color-accent) !important;
   color: white !important;
+}
+
+.hide {
+  display: none;
 }
 
 /* RESPONSIVE */

@@ -18,7 +18,7 @@ import FAQ from "./pages/FAQ";
 import Cart from "./pages/Cart";
 import Favoritos from "./pages/Favoritos";
 
-import { useAuth } from "./authentication/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
 

@@ -2,12 +2,11 @@
 import { supabase } from './supabaseclient'
 
 // Function to Register User
-export async function insert_into_user_profile (full_name, internal_email, password_hash, role_id) {
+export async function insert_into_user_profile (full_name, internal_email, password_hash) {
     const {data, error} = await supabase.rpc("insert_user", {
     p_full_name: full_name,
     p_email: internal_email,
-    p_password_hash: password_hash,
-    p_role_id: role_id
+    p_password_hash: password_hash
     })
     if (error) throw error
 
@@ -136,7 +135,7 @@ export async function delete_image(image_url) {
     try {
       const urlObj = new URL(url);
       const parts = urlObj.pathname.split(`/storage/v1/object/public/${BUCKET}/`);
-      return parts[1]; // ONLY file path inside bucket
+      return parts[1];
     } catch (err) {
       console.error("Invalid URL:", url);
       return null;
@@ -150,7 +149,7 @@ export async function delete_image(image_url) {
   const { data, error } = await supabase
     .storage
     .from(BUCKET)
-    .remove([path]);   // ✅ use path, not full URL
+    .remove([path]);
 
   if (error) {
     console.error("Error deleting image:", error.message);
