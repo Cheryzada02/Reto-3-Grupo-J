@@ -2,12 +2,11 @@
 import { supabase } from './supabaseclient'
 
 // Function to Register User
-export async function insert_into_user_profile (full_name, internal_email, password_hash, role_id) {
+export async function insert_into_user_profile (full_name, internal_email, password_hash) {
     const {data, error} = await supabase.rpc("insert_user", {
     p_full_name: full_name,
     p_email: internal_email,
-    p_password_hash: password_hash,
-    p_role_id: role_id
+    p_password_hash: password_hash
     })
     if (error) throw error
 
@@ -136,7 +135,7 @@ export async function delete_image(image_url) {
     try {
       const urlObj = new URL(url);
       const parts = urlObj.pathname.split(`/storage/v1/object/public/${BUCKET}/`);
-      return parts[1]; // ONLY file path inside bucket
+      return parts[1];
     } catch (err) {
       console.error("Invalid URL:", url);
       return null;
@@ -150,7 +149,7 @@ export async function delete_image(image_url) {
   const { data, error } = await supabase
     .storage
     .from(BUCKET)
-    .remove([path]);   // ✅ use path, not full URL
+    .remove([path]);
 
   if (error) {
     console.error("Error deleting image:", error.message);
@@ -158,4 +157,35 @@ export async function delete_image(image_url) {
   }
 
   return data;
+}
+
+// View to See Inventory_Movements
+export async function get_inventory_movements () {
+    const {data, error} = await supabase.from('view_inventory_movements').select('*')
+    if (error) throw error
+
+    return data
+}
+
+// Insert Inventory_Movements 
+export async function insert_inventory_movement(product_id, user_id, movement_type, quantity, reference, notes) {
+    const {data, error} = await supabase.rpc("insert_inventory_movement", {
+    p_product_id: product_id,
+    p_user_id: user_id,
+    p_movement_type: movement_type,
+    p_quantity: quantity,
+    p_reference: reference,
+    p_notes: notes
+    })
+    if (error) throw error
+
+    return data
+}
+
+// View to See Customers
+export async function get_customers () {
+    const {data, error} = await supabase.from('view_customers').select('*')
+    if (error) throw error
+
+    return data
 }

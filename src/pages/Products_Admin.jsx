@@ -1,7 +1,9 @@
-import { get_products, insert_into_products, update_products, get_suppliers } from "../authentication/db_functions";
+import { get_products, insert_into_products, update_products, get_suppliers, insert_inventory_movement } from "../authentication/db_functions";
 import { useState, useEffect } from "react";
 import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
+import { useAuth } from  "../context/AuthContext";
+import { PencilIcon, PlusSquareIcon } from "lucide-react";
 
 function Product_card({ product, on_edit }) {
 
@@ -16,13 +18,13 @@ function Product_card({ product, on_edit }) {
   return ( 
 
     <div className="product-card">
-    <div className="product-image">
-      {product.image_url ? (
-        <img src={product.image_url} alt={product.name} />
-      ) : (
-        <span>📦</span>
-      )}
-    </div>
+      <div className="product-image">
+        {product.image_url ? (
+          <img src={product.image_url} alt={product.name} loading="lazy"/>
+        ) : (
+          <span>📦</span>
+        )}
+      </div>
 
       <p className="product-title"><strong>Nombre: </strong> {product.product_name}</p>
 
@@ -34,10 +36,12 @@ function Product_card({ product, on_edit }) {
       <p className="product-info"><strong>Stock Minimio: </strong>{product.min_stock}</p>
       <p className="product-info"><strong>Status: </strong>{product.status}</p>
 
-
       <div className="product-actions">
-        <button className="btn-edit" onClick={() => on_edit(product)}>
-          ✏️ Edit
+        <button className="btn" onClick={() => on_edit(product)}>
+          <span>
+            <PencilIcon size={18} />
+            Editar
+          </span>
         </button>
       </div>
     </div>
@@ -47,10 +51,10 @@ function Product_card({ product, on_edit }) {
 
 
 function Product_List ({products, on_edit }) {
-  if (!products.length) return <p>No products found.</p>;
+  if (!products.length) return <p>Cargando Productos...</p>;
 
   return (
-    <div className="products-grid">
+    <div className="client-products-grid">
       {products.map(product => (
         <Product_card
           key={product.product_id}
@@ -183,7 +187,7 @@ function Product_Form({ product, on_save, on_close }) {
 
         <input name="cost_price" placeholder="Costo" value={form.cost_price} onChange={handle_change} />
         <input name="sale_price" placeholder="Precio de Venta" value={form.sale_price} onChange={handle_change} />
-        <input name="current_stock" placeholder="Inventario Actual" value={form.current_stock} onChange={handle_change} />
+        <input name="current_stock" placeholder="Inventario Actual" value={form.current_stock} onChange={handle_change} disabled={product ? true: false} />
         <input name="min_stock" placeholder="Inventario Minimo" value={form.min_stock} onChange={handle_change} />
 
         <select
@@ -222,6 +226,7 @@ export default function Products_page() {
   const [products, set_products] = useState([]);
   const [selected_product, set_selected_product] = useState(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const {user} = useAuth();
 
   const load_products = async () => {
     try {
@@ -245,7 +250,8 @@ export default function Products_page() {
         alert("Product Updated Sucessfully!")
       }
         else {
-        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url);
+        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, 0, data.min_stock, data.status, data.image_url);
+        const res2 = await insert_inventory_movement(res.product_id, user.user_id, "ENTRADA", data.current_stock)
         alert("Product Added Successfully!");
       }
 
@@ -263,8 +269,8 @@ export default function Products_page() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1>Products</h1>
+      <div className="page-header-admin">
+        <h1>Productos</h1>
 
         <button
           className="btn-primary"
@@ -273,7 +279,10 @@ export default function Products_page() {
             set_is_modal_open(true);
           }}
         >
-          ➕ Add Product
+          <span>
+            <PlusSquareIcon size={18} />
+            Agregar Producto
+          </span>
         </button>
       </div>
 

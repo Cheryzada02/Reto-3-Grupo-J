@@ -3,57 +3,77 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Navbar_Admin from "./components/Navbar_Admin";
+import Footer from "./components/Footer";
+
 import Home from "./pages/Home";
 import CustomerService from "./pages/CustomerService";
 import SupplierPage from "./pages/Suppliers_Admin";
 import ProductsPage from "./pages/Products_Admin";
-import User_form from "./components/testing2"; 
-import { useState, useEffect } from "react";
 import ProductosPagina from "./pages/Productos";
+import ProductoDetalle from "./pages/ProductoDetalle";
+import Inventory_movements from "./pages/Inventory_Movements_Admin";
+import Login from "./pages/Login";
+import Registro from "./pages/Registro";
+import FAQ from "./pages/FAQ";
+import Cart from "./pages/Cart";
+import Favoritos from "./pages/Favoritos";
+
+import { useAuth } from "./context/AuthContext";
+import { CartProvider } from "./context/CartContext";
+import { FavoritesProvider } from "./context/FavoritesContext";
+import Customer_page from "./pages/Customers_Admin";
 
 function App() {
-
-  const [user, setUser] = useState(null)
-  
-  useEffect(() => {
-  const session = JSON.parse(localStorage.getItem("session"));
-
-  if (session) {
-    setUser(session);
-  }
-}, []);
+  const { user } = useAuth();
 
   return (
-    <BrowserRouter>
-      {user?.role_id === 1 ? (
-        // ADMIN APP
-        <>
-          <Navbar_Admin />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/productos" element={<ProductsPage />} />
-            <Route path="/suplidores" element={<SupplierPage />} />
-            <Route path="/servicio-cliente" element={<CustomerService />} />
-          </Routes>
-        </>
-      ) : (
-        // CLIENT APP (default for everyone)
-        <>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<User_form />} />
-            <Route path="/servicio-cliente" element={<CustomerService />} />
-            <Route path="/productos" element={<ProductsPage />} />
-             <Route path="*" element={<Home />} />
-             <Route path="/productoscliente" element={<ProductosPagina />} />
-          </Routes>
-        </>
-      )}
-    </BrowserRouter>
+    <CartProvider>
+      <FavoritesProvider>
+        <BrowserRouter>
+          {user?.role_id === 1 ? (
+            <>
+              <Navbar_Admin />
+
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/productos" element={<ProductsPage />} />
+                <Route path="/suplidores" element={<SupplierPage />} />
+                <Route
+                  path="/inventory_movements"
+                  element={<Inventory_movements />}
+                />
+                <Route path="/customers" element={<Customer_page />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="*" element={<Home />} />
+              </Routes>
+
+              <Footer />
+            </>
+          ) : (
+            <>
+              <Navbar />
+
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/registro" element={<Registro />} />
+                <Route path="/servicio-cliente" element={<CustomerService />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/productos" element={<ProductosPagina />} />
+                <Route path="/productos/:id" element={<ProductoDetalle />} />
+                <Route path="/productoscliente" element={<ProductosPagina />} />
+                <Route path="/carrito" element={<Cart />} />
+                <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="*" element={<Home />} />
+              </Routes>
+
+              <Footer />
+            </>
+          )}
+        </BrowserRouter>
+      </FavoritesProvider>
+    </CartProvider>
   );
 }
 
 export default App;
-
-
