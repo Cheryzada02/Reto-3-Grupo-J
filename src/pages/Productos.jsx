@@ -7,118 +7,141 @@ import { useFavorites } from "../context/FavoritesContext";
 import { get_products } from "../authentication/db_functions";
 
 function ProductosPagina() {
+  const { addToCart } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
+
+  const [searchParams] = useSearchParams();
+  const searchText = searchParams.get("buscar")?.toLowerCase().trim() || "";
+  const originalSearchText = searchParams.get("buscar") || "";
+
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("es-DO", {
+      style: "currency",
+      currency: "DOP",
+    }).format(Number(value || 0));
+  };
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await get_products();
+
+        const productosActivos = data.filter(
+          (producto) => producto.status === "Activo"
+        );
+
+        setProductos(productosActivos);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const productosFiltrados = productos.filter((producto) => {
+    if (!searchText) return true;
+
+    const nombre = producto.product_name?.toLowerCase() || "";
+    const descripcion = producto.description?.toLowerCase() || "";
+    const suplidor = producto.supplier_name?.toLowerCase() || "";
+
+    return (
+      nombre.includes(searchText) ||
+      descripcion.includes(searchText) ||
+      suplidor.includes(searchText)
+    );
+  });
+
+  if (loading) {
+    return <p className="estado">Cargando productos...</p>;
+  }
+
+  if (!productos.length) {
+    return <p className="estado">No hay productos disponibles.</p>;
+  }
+
   return (
-    <>
-     
+    <main className="client-products-page">
+      <h1>Productos Disponibles</h1>
 
-      <section className="productos">
-        <h2>Productos Destacados</h2>
+      {searchText && (
+        <p className="estado">
+          Resultados para: <strong>{originalSearchText}</strong>
+        </p>
+      )}
 
-        <div className="contenedor">
+      {!productosFiltrados.length ? (
+        <p className="estado">No encontramos productos con esa búsqueda.</p>
+      ) : (
+        <div className="client-products-grid">
+          {productosFiltrados.map((producto) => {
+            const favorito = isFavorite(producto.product_id);
 
-          <div className="card">
-            <img
-              src="https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80"
-              alt="Taladro"
-            />
+            return (
+              <article
+                className="client-product-card"
+                key={producto.product_id}
+              >
+                <button
+                  type="button"
+                  className={
+                    favorito
+                      ? "client-favorite-button active"
+                      : "client-favorite-button"
+                  }
+                  onClick={() => toggleFavorite(producto)}
+                  aria-label={
+                    favorito ? "Quitar de favoritos" : "Agregar a favoritos"
+                  }
+                >
+                  <Heart size={18} />
+                </button>
 
-            <div className="card-body">
-              <h3>Taladro Eléctrico</h3>
-              <p>Potente taladro para trabajos profesionales.</p>
+                <Link
+                  to={`/productos/${producto.product_id}`}
+                  className="client-product-image"
+                >
+                  <img
+                    src={producto.image_url || "/placeholder-product.png"}
+                    alt={producto.product_name}
+                    loading="lazy"
+                  />
+                </Link>
 
-              <div className="precio">RD$ 3,500</div>
+                <div className="client-product-body">
+                  <Link to={`/productos/${producto.product_id}`}>
+                    <h3>{producto.product_name}</h3>
+                  </Link>
 
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
+                  <p>{producto.description}</p>
 
-          <div className="card">
-            <img
-              src="https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=800"
-              alt="Caja de herramientas"
-            />
+                  <div className="client-product-price">
+                    {formatCurrency(producto.sale_price)}
+                  </div>
 
-            <div className="card-body">
-              <h3>Caja de Herramientas</h3>
-              <p>Ideal para guardar todas tus herramientas.</p>
-
-              <div className="precio">RD$ 2,200</div>
-
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
-
-          <div className="card">
-            <img
-              src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800"
-              alt="Martillo"
-            />
-
-            <div className="card-body">
-              <h3>Martillo Profesional</h3>
-              <p>Resistente y cómodo para todo tipo de trabajo.</p>
-
-              <div className="precio">RD$ 850</div>
-
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
-
-          <div className="card">
-            <img
-              src="https://images.pexels.com/photos/5691613/pexels-photo-5691613.jpeg?auto=compress&cs=tinysrgb&w=800"
-              alt="Pintura"
-            />
-
-            <div className="card-body">
-              <h3>Pintura Blanca</h3>
-              <p>Pintura de alta calidad para interiores y exteriores.</p>
-
-              <div className="precio">RD$ 1,500</div>
-
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
-
-          <div className="card">
-            <img
-              src="https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg?auto=compress&cs=tinysrgb&w=800"
-              alt="Escalera"
-            />
-
-            <div className="card-body">
-              <h3>Escalera de Aluminio</h3>
-              <p>Resistente y segura para trabajos en altura.</p>
-
-              <div className="precio">RD$ 4,800</div>
-
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
-
-          <div className="card">
-            <img
-              src="https://images.pexels.com/photos/5691659/pexels-photo-5691659.jpeg?auto=compress&cs=tinysrgb&w=800"
-              alt="Llave inglesa"
-            />
-
-            <div className="card-body">
-              <h3>Llave Inglesa</h3>
-              <p>Herramienta ajustable ideal para reparaciones.</p>
-
-              <div className="precio">RD$ 950</div>
-
-              <a href="#" className="btn">Comprar</a>
-            </div>
-          </div>
-
+                  <button
+                    type="button"
+                    className="client-product-button"
+                    onClick={() => addToCart(producto)}
+                    disabled={Number(producto.current_stock || 0) <= 0}
+                  >
+                    {Number(producto.current_stock || 0) > 0
+                      ? "Agregar al carrito"
+                      : "Agotado"}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
-      </section>
-
-      <footer>
-        <p>&copy; 2026 Ferretería RD - Todos los derechos reservados</p>
-      </footer>
-    </>
+      )}
+    </main>
   );
 }
 
