@@ -1,104 +1,119 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
-
-export const productos = [
-  {
-    product_id: 1,
-    product_name: "Taladro Eléctrico",
-    description: "Potente taladro para trabajos profesionales.",
-    sale_price: 3500,
-    old_price: 4200,
-    brand: "Truper",
-    sku: "TAL-001",
-    stock: 12,
-    image_url:
-      "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    product_id: 2,
-    product_name: "Caja de Herramientas",
-    description: "Ideal para guardar todas tus herramientas.",
-    sale_price: 2200,
-    old_price: 2700,
-    brand: "Stanley",
-    sku: "CAJ-002",
-    stock: 8,
-    image_url:
-      "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=800",
-  },
-  {
-    product_id: 3,
-    product_name: "Martillo Profesional",
-    description: "Resistente y cómodo para todo tipo de trabajo.",
-    sale_price: 850,
-    old_price: 1100,
-    brand: "Pretul",
-    sku: "MAR-003",
-    stock: 20,
-    image_url:
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800",
-  },
-];
+import { get_products } from "../authentication/db_functions";
 
 function ProductosPagina() {
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
 
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-DO", {
       style: "currency",
       currency: "DOP",
-    }).format(value);
+    }).format(Number(value || 0));
   };
 
-  return (
-    <section className="productos">
-      <h2>Productos Destacados</h2>
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const data = await get_products();
 
-      <div className="contenedor">
+        const productosActivos = data.filter(
+          (producto) => producto.status === "Activo"
+        );
+
+        setProductos(productosActivos);
+      } catch (err) {
+        console.error("Error cargando productos:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  if (loading) {
+    return <p className="estado">Cargando productos...</p>;
+  }
+
+  if (!productos.length) {
+    return <p className="estado">No hay productos disponibles.</p>;
+  }
+
+  return (
+    <main className="client-products-page">
+      <h1>Productos Disponibles</h1>
+
+      <div className="client-products-grid">
         {productos.map((producto) => {
           const favorito = isFavorite(producto.product_id);
 
           return (
-            <div className="card" key={producto.product_id}>
+            <article
+              className="client-product-card"
+              key={producto.product_id}
+            >
               <button
                 type="button"
-                className={favorito ? "favorite-button active" : "favorite-button"}
+                className={
+                  favorito
+                    ? "client-favorite-button active"
+                    : "client-favorite-button"
+                }
                 onClick={() => toggleFavorite(producto)}
+                aria-label={
+                  favorito ? "Quitar de favoritos" : "Agregar a favoritos"
+                }
               >
                 <Heart size={18} />
               </button>
 
-              <Link to={`/productos/${producto.product_id}`}>
-                <img src={producto.image_url} alt={producto.product_name} />
+              <Link
+                to={`/productos/${producto.product_id}`}
+                className="client-product-image"
+              >
+                <img
+                  src={producto.image_url || "/placeholder-product.png"}
+                  alt={producto.product_name}
+                  loading="lazy"
+                />
               </Link>
 
-              <div className="card-body">
+              <div className="client-product-body">
                 <Link to={`/productos/${producto.product_id}`}>
                   <h3>{producto.product_name}</h3>
                 </Link>
 
                 <p>{producto.description}</p>
 
-                <div className="precio">
+                <div className="client-product-price">
                   {formatCurrency(producto.sale_price)}
                 </div>
 
                 <button
                   type="button"
-                  className="btn"
+                  className="client-product-button"
                   onClick={() => addToCart(producto)}
+                  disabled={Number(producto.current_stock || 0) <= 0}
                 >
-                  Agregar al carrito
+                  {Number(producto.current_stock || 0) > 0
+                    ? "Agregar al carrito"
+                    : "Agotado"}
                 </button>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>
-    </section>
+    </main>
   );
 }
 
