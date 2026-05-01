@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Heart, Share2, Flame, Eye } from "lucide-react";
+import { Heart, Share2, Flame, Eye, ShoppingCart } from "lucide-react";
 
 import { get_products } from "../authentication/db_functions";
 import { useCart } from "../context/CartContext";
@@ -12,6 +12,7 @@ export default function ProductoDetalle() {
   const { toggleFavorite, isFavorite } = useFavorites();
 
   const [producto, setProducto] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
@@ -20,11 +21,20 @@ export default function ProductoDetalle() {
       try {
         const data = await get_products();
 
-        const foundProduct = data.find(
+        const activeProducts = data.filter(
+          (item) => item.status === "Activo"
+        );
+
+        const foundProduct = activeProducts.find(
           (item) => item.product_id === Number(id)
         );
 
+        const suggestedProducts = activeProducts
+          .filter((item) => item.product_id !== Number(id))
+          .slice(0, 4);
+
         setProducto(foundProduct || null);
+        setRelatedProducts(suggestedProducts);
       } catch (error) {
         console.error("Error cargando producto:", error);
       } finally {
@@ -91,7 +101,7 @@ export default function ProductoDetalle() {
             <span className="offer-badge">Oferta</span>
 
             <img
-              src={producto.image_url}
+              src={producto.image_url || "/placeholder-product.png"}
               alt={producto.product_name}
             />
           </div>
@@ -199,6 +209,77 @@ export default function ProductoDetalle() {
           </p>
         </div>
       </section>
+
+      {relatedProducts.length > 0 && (
+        <section className="related-products-section">
+          <div className="related-products-header">
+            <span>También podría interesarte</span>
+            <h2>Productos relacionados</h2>
+          </div>
+
+          <div className="related-products-grid">
+            {relatedProducts.map((item) => {
+              const isRelatedFavorite = isFavorite(item.product_id);
+
+              return (
+                <article
+                  className="related-product-card"
+                  key={item.product_id}
+                >
+                  <button
+                    type="button"
+                    className={
+                      isRelatedFavorite
+                        ? "related-favorite-button active"
+                        : "related-favorite-button"
+                    }
+                    onClick={() => toggleFavorite(item)}
+                    aria-label={
+                      isRelatedFavorite
+                        ? "Quitar de favoritos"
+                        : "Agregar a favoritos"
+                    }
+                  >
+                    <Heart size={17} />
+                  </button>
+
+                  <Link
+                    to={`/productos/${item.product_id}`}
+                    className="related-product-image"
+                  >
+                    <img
+                      src={item.image_url || "/placeholder-product.png"}
+                      alt={item.product_name}
+                      loading="lazy"
+                    />
+                  </Link>
+
+                  <div className="related-product-body">
+                    <Link to={`/productos/${item.product_id}`}>
+                      <h3>{item.product_name}</h3>
+                    </Link>
+
+                    <p>{item.description}</p>
+
+                    <strong>{formatCurrency(item.sale_price)}</strong>
+
+                    <button
+                      type="button"
+                      onClick={() => addToCart(item)}
+                      disabled={Number(item.current_stock || 0) <= 0}
+                    >
+                      <ShoppingCart size={16} />
+                      {Number(item.current_stock || 0) > 0
+                        ? "Agregar"
+                        : "Agotado"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </main>
   );
 }
