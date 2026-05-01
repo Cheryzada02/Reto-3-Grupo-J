@@ -21,6 +21,7 @@ import Favoritos from "./pages/Favoritos";
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
+import Customer_page from "./pages/Customers_Admin";
 
 function App() {
   const { user } = useAuth();
@@ -41,7 +42,7 @@ function App() {
                   path="/inventory_movements"
                   element={<Inventory_movements />}
                 />
-                <Route path="/servicio-cliente" element={<CustomerService />} />
+                <Route path="/customers" element={<Customer_page />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<Home />} />
               </Routes>

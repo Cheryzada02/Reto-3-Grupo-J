@@ -4,6 +4,9 @@ import {
   get_products,
 } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
+import {
+  PlusSquareIcon
+} from "lucide-react";
 
 import { useState, useEffect } from "react";
 
@@ -33,6 +36,7 @@ function Movement_Row({ movement, on_edit }) {
       <td>{movement.user_name}</td>
       <td>{movement.user_email}</td>
       <td>{movement.reference}</td>
+      <td>{movement.notes}</td>
 
     </tr>
   );
@@ -241,8 +245,8 @@ export default function Inventory_movements() {
   return (
     <div className="page-container">
 
-      <div className="page-header">
-        <h1>Inventory Movements</h1>
+      <div className="page-header-admin">
+        <h1>Movimientos De Inventario</h1>
 
         <button
           className="btn-primary"
@@ -251,7 +255,10 @@ export default function Inventory_movements() {
             set_is_modal_open(true);
           }}
         >
-          ➕ Add Movement
+          <span>
+            <PlusSquareIcon size={18} />
+            Agregar Movimiento
+          </span>
         </button>
       </div>
 

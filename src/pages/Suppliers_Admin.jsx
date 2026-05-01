@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { get_suppliers, insert_into_suppliers, update_suppliers } from "../authentication/db_functions";
+import {
+  PlusSquareIcon, PencilIcon
+} from "lucide-react";
 
 function Supplier_card({ supplier, on_edit }) {
   return (
@@ -22,8 +25,11 @@ function Supplier_card({ supplier, on_edit }) {
       </p>
 
       <div className="product-actions">
-        <button className="btn-edit" onClick={() => on_edit(supplier)}>
-          ✏️ Edit
+        <button className="btn" onClick={() => on_edit(supplier)}>
+          <span>
+            <PencilIcon size={18} />
+            Editar
+          </span>
         </button>
       </div>
     </div>
@@ -163,8 +169,8 @@ export default function Supplier_page() {
   return (
     <div className="page-container">
 
-      <div className="page-header">
-        <h1>Suppliers</h1>
+      <div className="page-header-admin">
+        <h1>Suplidores</h1>
 
         <button
           className="btn-primary"
@@ -173,7 +179,10 @@ export default function Supplier_page() {
             set_is_modal_open(true);
           }}
         >
-          ➕ Add Supplier
+          <span>
+            <PlusSquareIcon size={18} />
+            Agregar Suplidor
+          </span>
         </button>
       </div>
 

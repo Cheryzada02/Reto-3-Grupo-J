@@ -181,3 +181,11 @@ export async function insert_inventory_movement(product_id, user_id, movement_ty
 
     return data
 }
+
+// View to See Customers
+export async function get_customers () {
+    const {data, error} = await supabase.from('view_customers').select('*')
+    if (error) throw error
+
+    return data
+}

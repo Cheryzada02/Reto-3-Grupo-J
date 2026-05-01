@@ -119,10 +119,10 @@ export default function Navbar_Admin() {
         </NavLink>
 
         <NavLink
-          to="/servicio-cliente"
+          to="/customers"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          Soporte
+          Clientes
         </NavLink>
       </nav>
     </header>

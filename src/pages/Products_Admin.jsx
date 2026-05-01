@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
+import { PencilIcon, PlusSquareIcon } from "lucide-react";
 
 function Product_card({ product, on_edit }) {
 
@@ -17,13 +18,13 @@ function Product_card({ product, on_edit }) {
   return ( 
 
     <div className="product-card">
-    <div className="product-image">
-      {product.image_url ? (
-        <img src={product.image_url} alt={product.name} loading="lazy"/>
-      ) : (
-        <span>📦</span>
-      )}
-    </div>
+      <div className="product-image">
+        {product.image_url ? (
+          <img src={product.image_url} alt={product.name} loading="lazy"/>
+        ) : (
+          <span>📦</span>
+        )}
+      </div>
 
       <p className="product-title"><strong>Nombre: </strong> {product.product_name}</p>
 
@@ -35,10 +36,12 @@ function Product_card({ product, on_edit }) {
       <p className="product-info"><strong>Stock Minimio: </strong>{product.min_stock}</p>
       <p className="product-info"><strong>Status: </strong>{product.status}</p>
 
-
       <div className="product-actions">
-        <button className="btn-edit" onClick={() => on_edit(product)}>
-          ✏️ Edit
+        <button className="btn" onClick={() => on_edit(product)}>
+          <span>
+            <PencilIcon size={18} />
+            Editar
+          </span>
         </button>
       </div>
     </div>
@@ -51,7 +54,7 @@ function Product_List ({products, on_edit }) {
   if (!products.length) return <p>Cargando Productos...</p>;
 
   return (
-    <div className="products-grid">
+    <div className="client-products-grid">
       {products.map(product => (
         <Product_card
           key={product.product_id}
@@ -266,8 +269,8 @@ export default function Products_page() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1>Products</h1>
+      <div className="page-header-admin">
+        <h1>Productos</h1>
 
         <button
           className="btn-primary"
@@ -276,7 +279,10 @@ export default function Products_page() {
             set_is_modal_open(true);
           }}
         >
-          ➕ Add Product
+          <span>
+            <PlusSquareIcon size={18} />
+            Agregar Producto
+          </span>
         </button>
       </div>
 
