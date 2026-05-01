@@ -167,7 +167,7 @@ export default function Navbar() {
           to="/servicio-cliente"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
-          Servicio al cliente
+          Soporte
         </NavLink>
 
         <NavLink
