@@ -17,11 +17,12 @@ import Registro from "./pages/Registro";
 import FAQ from "./pages/FAQ";
 import Cart from "./pages/Cart";
 import Favoritos from "./pages/Favoritos";
+import Customer_page from "./pages/Customers_Admin";
+import PaginaPerfil from "./pages/PaginaPerfil"; // NUEVO
 
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
-import Customer_page from "./pages/Customers_Admin";
 
 function App() {
   const { user } = useAuth();
@@ -43,6 +44,7 @@ function App() {
                   element={<Inventory_movements />}
                 />
                 <Route path="/customers" element={<Customer_page />} />
+                <Route path="/perfil" element={<PaginaPerfil />} /> {/* NUEVO */}
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<Home />} />
               </Routes>
@@ -57,11 +59,11 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
+                <Route path="/perfil" element={<PaginaPerfil />} /> {/* NUEVO */}
                 <Route path="/servicio-cliente" element={<CustomerService />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/productos" element={<ProductosPagina />} />
                 <Route path="/productos/:id" element={<ProductoDetalle />} />
-                <Route path="/productoscliente" element={<ProductosPagina />} />
                 <Route path="/carrito" element={<Cart />} />
                 <Route path="/favoritos" element={<Favoritos />} />
                 <Route path="*" element={<Home />} />

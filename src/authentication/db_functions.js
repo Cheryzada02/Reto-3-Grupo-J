@@ -189,3 +189,14 @@ export async function get_customers () {
 
     return data
 }
+// Update User Password
+export async function update_user_password(user_id, new_password) {
+  const { data, error } = await supabase.rpc("update_user_password", {
+    p_user_id: user_id,
+    p_new_password: new_password,
+  });
+
+  if (error) throw error;
+
+  return data;
+}

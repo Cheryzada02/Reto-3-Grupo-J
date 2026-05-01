@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   Search,
@@ -13,32 +13,22 @@ import {
 
 import { departamentos } from "../data/departamentos";
 import { useCart } from "../context/CartContext";
-import { useAuth } from  "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar() {
-
   const { user, logout } = useAuth();
-  
-  let login;
-  let user_name;
-  let class_when_login;
-
-  if (user?.role_id) {
-    login = "/";
-    user_name = user.user_name;
-    class_when_login = "navbar-action";
-  } else {
-    login = "/login";
-    user_name = "Acceder";
-    class_when_login = "hide";
-  }
 
   const [showDepartments, setShowDepartments] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const navigate = useNavigate();
   const { cartCount } = useCart();
+
+  const isLoggedIn = Boolean(user?.role_id);
+
+  const profileLink = isLoggedIn ? "/perfil" : "/login";
+  const userName = isLoggedIn ? user.user_name : "Acceder";
 
   const toggleDepartments = () => {
     setShowDepartments((prev) => !prev);
@@ -67,10 +57,10 @@ export default function Navbar() {
     navigate(`/productos?buscar=${encodeURIComponent(cleanSearch)}`);
   };
 
-  const handle_log_out = () => {
+  const handleLogout = () => {
     logout();
-    navigate("/")
-  }
+    navigate("/");
+  };
 
   return (
     <header className="navbar">
@@ -111,10 +101,10 @@ export default function Navbar() {
         </form>
 
         <div className="navbar-actions">
-          <Link to={login} className="navbar-action">
+          <Link to={profileLink} className="navbar-action">
             <User size={28} />
             <span>
-              Hola <strong>{user_name}</strong>
+              Hola <strong>{userName}</strong>
             </span>
           </Link>
 
@@ -133,13 +123,18 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <button onClick={handle_log_out} className={class_when_login}>
-            <LogOut size={26} />
-            <span>
-              <strong>Salir</strong>
-            </span>
-          </button>
-
+          {isLoggedIn && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="navbar-action navbar-logout"
+            >
+              <LogOut size={26} />
+              <span>
+                <strong>Salir</strong>
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -182,20 +177,6 @@ export default function Navbar() {
         </NavLink>
 
         <NavLink
-          to="/ofertas"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Ofertas
-        </NavLink>
-
-        <NavLink
-          to="/marcas"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Marcas
-        </NavLink>
-
-        <NavLink
           to="/servicio-cliente"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
@@ -207,6 +188,13 @@ export default function Navbar() {
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           Productos
+        </NavLink>
+
+        <NavLink
+          to="/perfil"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Perfil
         </NavLink>
       </nav>
     </header>
