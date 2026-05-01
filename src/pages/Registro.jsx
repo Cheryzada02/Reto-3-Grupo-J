@@ -38,7 +38,7 @@ export default function Registro() {
       return;
     }
 
-    const email = `${username}@ferreteriard.com`;
+    const email = `${username}@ferreteriaelupina.com`;
 
     try {
       await insert_into_user_profile(fullName, email, password, 3);

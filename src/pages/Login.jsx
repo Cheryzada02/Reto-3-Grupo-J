@@ -22,7 +22,7 @@ export default function Login() {
     const password = formData.get("password");
 
     const userData = {
-      email: `${username}@ferreteriard.com`,
+      email: `${username}@ferreteriaelupina.com`,
       password,
     };
 
