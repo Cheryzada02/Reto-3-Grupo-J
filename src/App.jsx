@@ -10,6 +10,7 @@ import CustomerService from "./pages/CustomerService";
 import SupplierPage from "./pages/Suppliers_Admin";
 import ProductsPage from "./pages/Products_Admin";
 import ProductosPagina from "./pages/Productos";
+import ProductoDetalle from "./pages/ProductoDetalle";
 import Inventory_movements from "./pages/Inventory_Movements_Admin";
 import Login from "./pages/Login";
 import Registro from "./pages/Registro";
@@ -58,6 +59,7 @@ function App() {
                 <Route path="/servicio-cliente" element={<CustomerService />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/productos" element={<ProductosPagina />} />
+                <Route path="/productos/:id" element={<ProductoDetalle />} />
                 <Route path="/productoscliente" element={<ProductosPagina />} />
                 <Route path="/carrito" element={<Cart />} />
                 <Route path="/favoritos" element={<Favoritos />} />

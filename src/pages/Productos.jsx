@@ -1,13 +1,18 @@
 import { Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
 
-const productos = [
+export const productos = [
   {
     product_id: 1,
     product_name: "Taladro Eléctrico",
     description: "Potente taladro para trabajos profesionales.",
     sale_price: 3500,
+    old_price: 4200,
+    brand: "Truper",
+    sku: "TAL-001",
+    stock: 12,
     image_url:
       "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=80",
   },
@@ -16,6 +21,10 @@ const productos = [
     product_name: "Caja de Herramientas",
     description: "Ideal para guardar todas tus herramientas.",
     sale_price: 2200,
+    old_price: 2700,
+    brand: "Stanley",
+    sku: "CAJ-002",
+    stock: 8,
     image_url:
       "https://images.unsplash.com/photo-1504148455328-c376907d081c?q=80&w=800",
   },
@@ -24,32 +33,12 @@ const productos = [
     product_name: "Martillo Profesional",
     description: "Resistente y cómodo para todo tipo de trabajo.",
     sale_price: 850,
+    old_price: 1100,
+    brand: "Pretul",
+    sku: "MAR-003",
+    stock: 20,
     image_url:
       "https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=800",
-  },
-  {
-    product_id: 4,
-    product_name: "Pintura Blanca",
-    description: "Pintura de alta calidad para interiores y exteriores.",
-    sale_price: 1500,
-    image_url:
-      "https://images.pexels.com/photos/5691613/pexels-photo-5691613.jpeg?auto=compress&cs=tinysrgb&w=800",
-  },
-  {
-    product_id: 5,
-    product_name: "Escalera de Aluminio",
-    description: "Resistente y segura para trabajos en altura.",
-    sale_price: 4800,
-    image_url:
-      "https://images.pexels.com/photos/1249611/pexels-photo-1249611.jpeg?auto=compress&cs=tinysrgb&w=800",
-  },
-  {
-    product_id: 6,
-    product_name: "Llave Inglesa",
-    description: "Herramienta ajustable ideal para reparaciones.",
-    sale_price: 950,
-    image_url:
-      "https://images.pexels.com/photos/5691659/pexels-photo-5691659.jpeg?auto=compress&cs=tinysrgb&w=800",
   },
 ];
 
@@ -78,19 +67,19 @@ function ProductosPagina() {
                 type="button"
                 className={favorito ? "favorite-button active" : "favorite-button"}
                 onClick={() => toggleFavorite(producto)}
-                aria-label={
-                  favorito
-                    ? "Quitar de favoritos"
-                    : "Agregar a favoritos"
-                }
               >
                 <Heart size={18} />
               </button>
 
-              <img src={producto.image_url} alt={producto.product_name} />
+              <Link to={`/productos/${producto.product_id}`}>
+                <img src={producto.image_url} alt={producto.product_name} />
+              </Link>
 
               <div className="card-body">
-                <h3>{producto.product_name}</h3>
+                <Link to={`/productos/${producto.product_id}`}>
+                  <h3>{producto.product_name}</h3>
+                </Link>
+
                 <p>{producto.description}</p>
 
                 <div className="precio">
