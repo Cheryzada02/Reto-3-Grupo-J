@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Lock, User, AlertCircle } from "lucide-react";
+import {
+  Lock,
+  User,
+  AlertCircle,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+
 import { login_user_profile } from "../authentication/db_functions";
 
 export default function Login() {
@@ -8,6 +15,7 @@ export default function Login() {
 
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👈 NUEVO
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -26,7 +34,10 @@ export default function Login() {
     };
 
     try {
-      const res = await login_user_profile(userData.email, userData.password);
+      const res = await login_user_profile(
+        userData.email,
+        userData.password
+      );
 
       if (!res) {
         setResult("Credenciales incorrectas.");
@@ -69,6 +80,7 @@ export default function Login() {
         </div>
 
         <form onSubmit={handleLogin} className="login-form">
+          {/* USUARIO */}
           <div className="login-group">
             <label htmlFor="email">Usuario</label>
 
@@ -85,21 +97,42 @@ export default function Login() {
             </div>
           </div>
 
+          {/* PASSWORD */}
           <div className="login-group">
             <label htmlFor="password">Contraseña</label>
 
             <div className="login-input-wrapper">
               <Lock size={18} />
+
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"} // 👈 CLAVE
                 name="password"
                 placeholder="Tu contraseña"
                 required
               />
+
+              {/* BOTÓN OJITO */}
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={
+                  showPassword
+                    ? "Ocultar contraseña"
+                    : "Mostrar contraseña"
+                }
+              >
+                {showPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
             </div>
           </div>
 
+          {/* MENSAJE */}
           {result && (
             <div className="login-message">
               <AlertCircle size={18} />
@@ -107,11 +140,16 @@ export default function Login() {
             </div>
           )}
 
-          <button type="submit" className="login-button" disabled={loading}>
+          {/* BOTÓN */}
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
             {loading ? "Validando..." : "Entrar"}
           </button>
 
-          {/* LINK A REGISTRO */}
+          {/* REGISTRO */}
           <div className="login-footer">
             <a href="/registro" className="login-link">
               ¿No tienes cuenta? Crear cuenta

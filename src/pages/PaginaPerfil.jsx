@@ -163,14 +163,6 @@ export default function PaginaPerfil() {
                 </div>
               </div>
             </div>
-
-            <div className="perfil-note">
-              <Info size={18} />
-              <p>
-                El rol interno de la cuenta se utiliza para permisos del sistema,
-                pero no se muestra como información editable del cliente.
-              </p>
-            </div>
           </article>
 
           <article className="perfil-card">
