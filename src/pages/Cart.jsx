@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Trash2, X, CheckCircle } from "lucide-react";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useCart } from "../context/CartContext";
 
 export default function Cart() {
@@ -47,6 +49,70 @@ export default function Cart() {
     }).format(Number(value || 0));
   };
 
+  const generarFacturaProvisionalPDF = () => {
+    const doc = new jsPDF();
+
+    const numeroFactura = `FE-${Date.now()}`;
+    const fecha = new Date().toLocaleDateString("es-DO");
+    const hora = new Date().toLocaleTimeString("es-DO");
+
+    doc.setFontSize(20);
+    doc.text("Ferreteria Elupina", 14, 18);
+
+    doc.setFontSize(12);
+    doc.text("Factura Provisional", 14, 28);
+    doc.text(`Factura No.: ${numeroFactura}`, 14, 38);
+    doc.text(`Fecha: ${fecha}`, 14, 46);
+    doc.text(`Hora: ${hora}`, 14, 54);
+    doc.text("Modalidad: Retiro en tienda (Pick Up)", 14, 62);
+    doc.text(
+      `Método de pago: ${
+        paymentMethod === "efectivo" ? "Efectivo al retirar" : "Transferencia bancaria"
+      }`,
+      14,
+      70
+    );
+
+    autoTable(doc, {
+      startY: 82,
+      head: [["Producto", "Cantidad", "Precio", "Subtotal"]],
+      body: cartItems.map((item) => [
+        item.product_name,
+        item.quantity,
+        formatCurrency(item.sale_price),
+        formatCurrency(Number(item.sale_price) * Number(item.quantity)),
+      ]),
+      styles: {
+        fontSize: 10,
+      },
+      headStyles: {
+        fillColor: [24, 59, 89],
+      },
+    });
+
+    const finalY = doc.lastAutoTable.finalY + 12;
+
+    doc.setFontSize(11);
+    doc.text(`Subtotal: ${formatCurrency(subtotal)}`, 14, finalY);
+    doc.text(`ITBIS 18%: ${formatCurrency(tax)}`, 14, finalY + 8);
+    doc.text(`Total: ${formatCurrency(total)}`, 14, finalY + 16);
+
+    doc.setFontSize(9);
+    doc.text(
+      "Esta factura es provisional. El pedido debe ser confirmado al momento del retiro en tienda.",
+      14,
+      finalY + 32
+    );
+
+    doc.text(
+      "Ferreteria Elupina no realiza delivery ni envíos. Solo retiro en tienda.",
+      14,
+      finalY + 40
+    );
+
+    doc.save(`factura-provisional-${numeroFactura}.pdf`);
+  };
+
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert("El carrito está vacío.");
@@ -57,7 +123,12 @@ export default function Cart() {
   };
 
   const confirmOrder = () => {
-    alert("Orden confirmada correctamente. Recuerda que el pedido es solo para Pick Up.");
+    generarFacturaProvisionalPDF();
+
+    alert(
+      "Orden confirmada correctamente. Se generó una factura provisional en PDF."
+    );
+
     clearCart();
     setShowCheckoutDetail(false);
   };
@@ -203,7 +274,11 @@ export default function Cart() {
               </div>
             )}
 
-            <button className="checkout-button" onClick={handleCheckout}>
+            <button
+              type="button"
+              className="checkout-button"
+              onClick={handleCheckout}
+            >
               Finalizar compra
             </button>
           </aside>
@@ -231,74 +306,36 @@ export default function Cart() {
 
             <div className="checkout-detail-items">
               {cartItems.map((item) => (
-                <article className="checkout-detail-item" key={item.product_id}>
-                  <span>{item.product_name}</span>
-                  <small>
-                    {item.quantity} x {formatCurrency(item.sale_price)}
-                  </small>
+                <div className="checkout-detail-item" key={item.product_id}>
+                  <span>
+                    {item.product_name} x {item.quantity}
+                  </span>
+
                   <strong>
-                    {formatCurrency(Number(item.sale_price) * item.quantity)}
+                    {formatCurrency(
+                      Number(item.sale_price) * Number(item.quantity)
+                    )}
                   </strong>
-                </article>
+                </div>
               ))}
             </div>
 
-            <div className="checkout-detail-summary">
-              <p>
-                <span>Subtotal</span>
-                <strong>{formatCurrency(subtotal)}</strong>
-              </p>
-
-              <p>
-                <span>ITBIS 18%</span>
-                <strong>{formatCurrency(tax)}</strong>
-              </p>
-
-              <p>
-                <span>Envío</span>
-                <strong>No disponible</strong>
-              </p>
-
-              <p className="checkout-detail-total">
-                <span>Total a pagar</span>
-                <strong>{formatCurrency(total)}</strong>
-              </p>
+            <div className="checkout-detail-total">
+              <span>Total a pagar</span>
+              <strong>{formatCurrency(total)}</strong>
             </div>
 
-            <div className="checkout-payment-detail">
-              <h3>Método de pago</h3>
-
-              <p>
-                {paymentMethod === "efectivo"
-                  ? "Efectivo al retirar en tienda."
-                  : "Transferencia bancaria."}
-              </p>
-
-              {paymentMethod === "transferencia" && (
-                <div className="checkout-bank-list">
-                  {bankAccounts.map((account) => (
-                    <div key={account.accountNumber}>
-                      <strong>{account.bank}</strong>
-                      <p>{account.type}</p>
-                      <p>Cuenta: {account.accountNumber}</p>
-                      <p>A nombre de: {account.accountName}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="pickup-notice">
-              El pedido será preparado para retiro en tienda. No realizamos
-              delivery ni envíos.
-            </div>
+            <p className="checkout-detail-note">
+              Al confirmar, se generará una factura provisional en PDF. El
+              pedido debe ser retirado en tienda.
+            </p>
 
             <button
               type="button"
               className="checkout-button"
               onClick={confirmOrder}
             >
-              Confirmar orden
+              Hacer pedido y generar factura
             </button>
           </div>
         </section>
