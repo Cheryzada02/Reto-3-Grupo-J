@@ -33,7 +33,7 @@ export default function Navbar_Admin() {
         <div className="navbar-contact">
           <span>
             <Headphones size={16} />
-            (829) 123-0000
+            +1(809)-536-9114
           </span>
 
           <span>

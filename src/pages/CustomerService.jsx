@@ -116,7 +116,7 @@ export default function CustomerService() {
             <Phone size={22} />
             <div>
               <h3>Teléfono</h3>
-              <p>(829) 123-0000</p>
+              <p>+1(809)-536-9114</p>
             </div>
           </article>
 
@@ -124,7 +124,7 @@ export default function CustomerService() {
             <MessageCircle size={22} />
             <div>
               <h3>WhatsApp</h3>
-              <p>(829) 123-0000</p>
+              <p>+1(809)-536-9114</p>
             </div>
           </article>
 
@@ -138,17 +138,22 @@ export default function CustomerService() {
 
           <article className="customer-info-item">
             <MapPin size={22} />
-            <div>
-              <h3>Ubicación</h3>
-              <p>Santo Domingo, República Dominicana</p>
-            </div>
+            <div className="footer-map">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3783.7342576847077!2d-69.89072652497511!3d18.495692582593076!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8eaf885c609480b3%3A0xb9a02438ccf9b799!2sFerreter%C3%ADa%20Elupina!5e0!3m2!1ses!2sdo!4v1777756257795!5m2!1ses!2sdo"
+              loading="lazy"
+              title="Ubicación Ferreteria Elupina"
+            />
+          </div>
           </article>
 
           <article className="customer-info-item">
             <Clock size={22} />
             <div>
               <h3>Horario</h3>
-              <p>Lunes a sábado, horario laboral</p>
+              <p>Lunes - Viernes: 8:00 AM - 6:00 PM</p>
+              <p>Sábados: 8:00 AM - 4:00 PM</p>
+              <p>Domingos: Cerrado</p>
             </div>
           </article>
 
@@ -203,7 +208,7 @@ export default function CustomerService() {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="(829) 000-0000"
+                  placeholder="+1(809)-536-9114"
                   value={formData.phone}
                   onChange={handleChange}
                 />
