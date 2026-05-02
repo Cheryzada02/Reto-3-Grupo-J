@@ -3259,3 +3259,154 @@ h1 {
     padding: 22px;
   }
 }
+/* =========================
+   DEPARTAMENTOS ADMIN
+========================= */
+
+.departamentos-admin-page {
+  width: min(1200px, 92%);
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.departamentos-admin-header {
+  background: linear-gradient(
+    135deg,
+    var(--color-navy),
+    var(--color-navy-light)
+  );
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-medium);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.departamentos-admin-header span {
+  color: var(--color-secondary-light);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.departamentos-admin-header h1 {
+  color: white;
+  margin: 8px 0;
+}
+
+.departamentos-admin-header p {
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+
+.departamentos-admin-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--color-secondary);
+  color: var(--color-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.departamentos-admin-panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 26px;
+}
+
+.departamentos-admin-add {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.departamentos-admin-add button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.departamentos-admin-table {
+  display: grid;
+  gap: 10px;
+}
+
+.departamentos-admin-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 140px 160px;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  background-color: var(--color-bg);
+}
+
+.departamentos-admin-row-head {
+  background-color: var(--color-navy);
+  color: white;
+  font-weight: 800;
+}
+
+.departamentos-admin-status {
+  display: inline-flex;
+  width: fit-content;
+  background-color: rgba(47, 143, 133, 0.12);
+  color: var(--color-primary-dark);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.departamentos-admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.departamentos-admin-actions button {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.departamentos-admin-delete {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+@media (max-width: 760px) {
+  .departamentos-admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .departamentos-admin-add {
+    grid-template-columns: 1fr;
+  }
+
+  .departamentos-admin-row {
+    grid-template-columns: 1fr;
+  }
+
+  .departamentos-admin-row-head {
+    display: none;
+  }
+
+  .departamentos-admin-actions {
+    justify-content: flex-start;
+  }
+}

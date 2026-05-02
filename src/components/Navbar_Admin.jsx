@@ -49,11 +49,12 @@ export default function Navbar_Admin() {
 
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
-          Ferreteria Elupina Admin
+          Ferretería Elupina Admin
         </Link>
 
         <form className="navbar-search">
           <input type="text" placeholder="Buscar en la tienda..." />
+
           <button type="submit">
             <Search size={22} />
           </button>
@@ -62,6 +63,7 @@ export default function Navbar_Admin() {
         <div className="navbar-actions">
           <Link to={login} className="navbar-action">
             <User size={28} />
+
             <span>
               Hola <strong>{user_name}</strong>
             </span>
@@ -74,6 +76,7 @@ export default function Navbar_Admin() {
               className={class_when_login}
             >
               <LogOut size={26} />
+
               <span>
                 <strong>Salir</strong>
               </span>
@@ -96,6 +99,13 @@ export default function Navbar_Admin() {
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           Productos
+        </NavLink>
+
+        <NavLink
+          to="/departamentos"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Departamentos
         </NavLink>
 
         <NavLink

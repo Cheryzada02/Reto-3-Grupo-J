@@ -18,7 +18,8 @@ import FAQ from "./pages/FAQ";
 import Cart from "./pages/Cart";
 import Favoritos from "./pages/Favoritos";
 import Customer_page from "./pages/Customers_Admin";
-import PaginaPerfil from "./pages/PaginaPerfil"; // NUEVO
+import PaginaPerfil from "./pages/PaginaPerfil";
+import DepartamentosAdmin from "./pages/Departamentos_Admin";
 
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
@@ -38,13 +39,14 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<ProductsPage />} />
+                <Route path="/departamentos" element={<DepartamentosAdmin />} />
                 <Route path="/suplidores" element={<SupplierPage />} />
                 <Route
                   path="/inventory_movements"
                   element={<Inventory_movements />}
                 />
                 <Route path="/customers" element={<Customer_page />} />
-                <Route path="/perfil" element={<PaginaPerfil />} /> {/* NUEVO */}
+                <Route path="/perfil" element={<PaginaPerfil />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<Home />} />
               </Routes>
@@ -59,7 +61,7 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/registro" element={<Registro />} />
-                <Route path="/perfil" element={<PaginaPerfil />} /> {/* NUEVO */}
+                <Route path="/perfil" element={<PaginaPerfil />} />
                 <Route path="/servicio-cliente" element={<CustomerService />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/productos" element={<ProductosPagina />} />
