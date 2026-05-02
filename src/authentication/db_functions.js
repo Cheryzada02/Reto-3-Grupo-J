@@ -24,6 +24,15 @@ export async function login_user_profile (email, password) {
     return data
 }
 
+// View to See Departments
+export async function get_departments () {
+    const {data, error} = await supabase.from('view_departments').select('*')
+    if (error) throw error
+
+    return data
+}
+
+
 // View to See Suppliers
 export async function get_suppliers () {
     const {data, error} = await supabase.from('view_suppliers').select('*')
@@ -189,6 +198,7 @@ export async function get_customers () {
 
     return data
 }
+
 // Update User Password
 export async function update_user_password(user_id, new_password) {
   const { data, error } = await supabase.rpc("update_user_password", {
@@ -199,4 +209,59 @@ export async function update_user_password(user_id, new_password) {
   if (error) throw error;
 
   return data;
+}
+
+// Check Stock Availability
+export async function check_stock_availablity(product_id, quantity) {
+  const { data, error } = await supabase.rpc("check_stock_available", {
+    p_product_id: product_id,
+    p_qty: quantity,
+  });
+
+  if (error) throw error;
+
+  return data;
+}
+
+// Insert orders 
+export async function insert_orders(customer_id, created_by_user_id, order_type, sub_total, tax, discount, total) {
+    const {data, error} = await supabase.rpc("insert_orders", {
+    p_customer_id: customer_id,
+    p_created_by_user_id: created_by_user_id,
+    p_order_type: order_type,
+    p_sub_total: sub_total,
+    p_tax: tax,
+    p_discount: discount,
+    p_total: total
+    })
+    if (error) throw error
+
+    return data
+}
+
+// Get Indidividual Customer
+export async function get_customer_info(user_id) {
+    const {data, error} = await supabase.rpc("get_customer_info", {
+    p_user_id: user_id
+
+    })
+    if (error) throw error
+
+    return data
+}
+
+// Insert orders items
+export async function insert_orders_items(order_id, product_id, quantity, unit_price, discount, line_total, user_id) {
+    const {data, error} = await supabase.rpc("insert_orders_items", {
+    p_order_id: order_id,
+    p_product_id: product_id,
+    p_quantity: quantity,
+    p_unit_price: unit_price,
+    p_discount: discount,
+    p_line_total: line_total,
+    p_user_id: user_id
+    })
+    if (error) throw error
+
+    return data
 }

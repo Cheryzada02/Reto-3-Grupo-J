@@ -1,4 +1,4 @@
-import { get_products, insert_into_products, update_products, get_suppliers, insert_inventory_movement } from "../authentication/db_functions";
+import { get_products, insert_into_products, update_products, get_suppliers, insert_inventory_movement, get_departments } from "../authentication/db_functions";
 import { useState, useEffect } from "react";
 import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
@@ -30,6 +30,7 @@ function Product_card({ product, on_edit }) {
 
       <p className="product-info"> <strong>Descripcion: </strong> {product.description}</p>
       <p className="product-info"><strong>Suplidor: </strong> {product.supplier_name}</p>
+      <p className="product-info"><strong>Departamento: </strong> {product.depar}</p>
       <p className="product-info"><strong>Precio Costo: </strong>{formatCurrency(product.cost_price)}</p>
       <p className="product-info"><strong>Precio Venta: </strong>{formatCurrency(product.sale_price)}</p>
       <p className="product-info"><strong>Stock: </strong>{product.current_stock}</p>
@@ -76,11 +77,13 @@ function Product_Form({ product, on_save, on_close }) {
     current_stock: "", 
     min_stock: "",
     status: "",
-    image_url: ""
+    image_url: "",
+    department_id: ""
   });
 
   const [loading, set_loading] = useState(false)
   const [suppliers, set_suppliers] = useState([]);
+  const [departments, set_departments] = useState([]);
   const [product_status, set_status] = useState([]);
   const [image_file, set_image_file] = useState(null);
 
@@ -107,6 +110,20 @@ function Product_Form({ product, on_save, on_close }) {
   useEffect(() => {
     load_suppliers();
   }, []);
+
+  const load_departments = async () => {
+    try {
+      const data = await get_departments();
+      set_departments(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    load_departments();
+  }, []);
+
 
 
   useEffect(() => {
@@ -185,6 +202,19 @@ function Product_Form({ product, on_save, on_close }) {
           ))}
         </select>
 
+        <select
+            name="department_id"
+            value={form.department_id}
+            onChange={handle_change} >
+          
+          <option value="">-- Seleccione un Departamento --</option>
+          {suppliers.map((s) => (
+            <option key={s.department_id} value={s.department_id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+
         <input name="cost_price" placeholder="Costo" value={form.cost_price} onChange={handle_change} />
         <input name="sale_price" placeholder="Precio de Venta" value={form.sale_price} onChange={handle_change} />
         <input name="current_stock" placeholder="Inventario Actual" value={form.current_stock} onChange={handle_change} disabled={product ? true: false} />
@@ -246,11 +276,11 @@ export default function Products_page() {
 
     try {
       if (data.product_id) {
-        const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url);
+        const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url, data.department_id);
         alert("Product Updated Sucessfully!")
       }
         else {
-        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, 0, data.min_stock, data.status, data.image_url);
+        const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, 0, data.min_stock, data.status, data.image_url, data.department_id);
         const res2 = await insert_inventory_movement(res.product_id, user.user_id, "ENTRADA", data.current_stock)
         alert("Product Added Successfully!");
       }
