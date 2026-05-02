@@ -165,13 +165,12 @@ export default function Cart() {
         console.log(error)
       }
 
+      alert(
+        "Orden confirmada correctamente. Se generó una factura provisional en PDF.");
+        
       generarFacturaProvisionalPDF();
-
-    alert(
-      "Orden confirmada correctamente. Se generó una factura provisional en PDF."
-    );
   
-    clearCart();
+      clearCart();
       setShowCheckoutDetail(true);
       set_loading(false);
     }
