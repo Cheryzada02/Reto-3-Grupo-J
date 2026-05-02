@@ -9,13 +9,17 @@ import {
 } from "lucide-react";
 
 import { login_user_profile } from "../authentication/db_functions";
+import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
 
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👈 NUEVO
+  const [showPassword, setShowPassword] = useState(false);
+  const { cartItems } = useCart();
+  const { login } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -51,10 +55,18 @@ export default function Login() {
         user_name: res.user_name,
       };
 
-      localStorage.setItem("session", JSON.stringify(session));
+      // localStorage.setItem("session", JSON.stringify(session));
 
-      navigate("/");
-      window.location.reload();
+      login(session)
+
+      if (cartItems?.length > 0 && res.role_id !== 1) {
+        navigate("/carrito")  
+      }
+      else {
+        navigate("/");
+        window.location.reload();
+      }
+
     } catch (err) {
       setResult("No se pudo iniciar sesión. Intenta nuevamente.");
       console.error(err.message);
@@ -106,7 +118,7 @@ export default function Login() {
 
               <input
                 id="password"
-                type={showPassword ? "text" : "password"} // 👈 CLAVE
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Tu contraseña"
                 required
