@@ -1,4 +1,4 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
   Search,
   User,
@@ -6,38 +6,29 @@ import {
   Headphones,
   LogOut,
 } from "lucide-react";
-import { useAuth } from  "../context/AuthContext";
 
-
+import { useAuth } from "../context/AuthContext";
 import "./Navbar.css";
 
 export default function Navbar_Admin() {
-
   const { user, logout } = useAuth();
-  
-  
-  let login;
-  let user_name;
-  let class_when_login;
+  const navigate = useNavigate();
 
-  if (user?.role_id) {
-    login = "/";
-    user_name = user.user_name;
-    class_when_login = "navbar-action";
-  } else {
-    login = "/login";
-    user_name = "Acceder";
-    class_when_login = "hide";
-  }
+  const isLoggedIn = Boolean(user?.role_id);
+
+  const login = isLoggedIn ? "/perfil" : "/login";
+  const user_name = isLoggedIn ? user.user_name : "Acceder";
+  const class_when_login = isLoggedIn
+    ? "navbar-action navbar-logout"
+    : "hide";
 
   const handle_log_out = () => {
     logout();
-    navigate("/")
-  }
+    navigate("/");
+  };
 
   return (
     <header className="navbar">
-      {/* TOP BAR */}
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
@@ -47,7 +38,7 @@ export default function Navbar_Admin() {
 
           <span>
             <Mail size={16} />
-            soporteweb@Ferreteriaelupina.com.do
+            soporteweb@ferreteriaelupina.com.do
           </span>
         </div>
 
@@ -56,7 +47,6 @@ export default function Navbar_Admin() {
         </Link>
       </div>
 
-      {/* MAIN BAR */}
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
           Ferreteria Elupina Admin
@@ -77,17 +67,21 @@ export default function Navbar_Admin() {
             </span>
           </Link>
 
-          <button onClick={handle_log_out} className={class_when_login}>
-            <LogOut size={26} />
-            <span>
-              <strong>Salir</strong>
-            </span>
-          </button>
-
+          {isLoggedIn && (
+            <button
+              type="button"
+              onClick={handle_log_out}
+              className={class_when_login}
+            >
+              <LogOut size={26} />
+              <span>
+                <strong>Salir</strong>
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* MENU ADMIN */}
       <nav className="navbar-menu">
         <NavLink
           to="/"
