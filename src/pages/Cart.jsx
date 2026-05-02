@@ -5,6 +5,7 @@ import autoTable from "jspdf-autotable";
 import { useCart } from "../context/CartContext";
 import { check_stock_availablity, get_customer_info, insert_orders, insert_orders_items } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
   const {
@@ -20,6 +21,7 @@ export default function Cart() {
   const [loading, set_loading] = useState(false)
   const {user} = useAuth();
   const [customer, set_customer] = useState([]);
+  const navigate = useNavigate();
 
   const taxRate = 0.18;
   const subtotal = cartTotal;
@@ -128,51 +130,59 @@ export default function Cart() {
   };
 
   const confirmOrder = async () => {
-    set_loading(true);
-    let errors = false
 
-    for (const item of cartItems) {
-      
-      try {
-        const response = await check_stock_availablity(item.product_id, item.quantity)
-      } catch (error) {
-        if (error.message === "No Hay Stock Suficiente") {
-          alert("No Hay Stock Suficiente Para Producto: " + item.product_name);
-          errors = true
+    if (!user) {
+      navigate("/login");
+
+    }
+    else {
+      set_loading(true);
+      let errors = false
+
+      for (const item of cartItems) {
+        
+        try {
+          const response = await check_stock_availablity(item.product_id, item.quantity)
+        } catch (error) {
+          if (error.message === "No Hay Stock Suficiente") {
+            alert("No Hay Stock Suficiente Para Producto: " + item.product_name);
+            errors = true
+          }
         }
       }
-    }
-    
-    if (!errors) {
-
-      try {
-        const response_customer = await get_customer_info(user.user_id)
-        set_customer(response_customer)
+      
+      if (!errors) {
 
         try {
-          const response_order = await insert_orders(customer.customer_id, user.user_id, "Online", subtotal, tax, 0, total)
-          for (const item of cartItems) { 
-            try {
-              const res = await insert_orders_items(response_order, item.product_id, item.quantity, item.sale_price, 0, item.quantity * item.sale_price, user.user_id)
-            } catch (error) {
-              console.log(error)
+          const response_customer = await get_customer_info(user.user_id)
+          set_customer(response_customer)
+
+          try {
+            const response_order = await insert_orders(customer.customer_id, user.user_id, "Online", subtotal, tax, 0, total)
+            for (const item of cartItems) { 
+              try {
+                const res = await insert_orders_items(response_order, item.product_id, item.quantity, item.sale_price, 0, item.quantity * item.sale_price, user.user_id)
+              } catch (error) {
+                console.log(error)
+              }
             }
+          } catch (error) {
+            console.log(error)  
           }
         } catch (error) {
-          console.log(error)  
+          console.log(error)
         }
-      } catch (error) {
-        console.log(error)
+
+        alert(
+          "Orden confirmada correctamente. Se generó una factura provisional en PDF.");
+
+        generarFacturaProvisionalPDF();
+    
+        clearCart();
+        setShowCheckoutDetail(true);
+        set_loading(false);
       }
 
-      alert(
-        "Orden confirmada correctamente. Se generó una factura provisional en PDF.");
-        
-      generarFacturaProvisionalPDF();
-  
-      clearCart();
-      setShowCheckoutDetail(true);
-      set_loading(false);
     }
 
   };
