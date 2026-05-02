@@ -1,55 +1,82 @@
-const faqs = [
+import { HelpCircle } from "lucide-react";
+
+const faqItems = [
   {
+    id: 1,
     question: "¿Dónde está ubicada la ferretería?",
     answer:
-      "Nuestra ferretería está ubicada en la República Dominicana. Puedes visitarnos en horario laboral o contactarnos por teléfono para más información.",
+      "Estamos ubicados en C/ Domingo Savio #50, Distrito Nacional, República Dominicana.",
   },
   {
+    id: 2,
     question: "¿Hacen entregas a domicilio?",
     answer:
-      "Sí, realizamos entregas dependiendo de la zona y la disponibilidad del producto. El costo de envío puede variar según la ubicación.",
+      "Actualmente no realizamos envíos ni delivery. Todas las compras deben ser retiradas directamente en nuestra tienda mediante Pick Up.",
   },
   {
+    id: 3,
     question: "¿Puedo consultar disponibilidad de productos?",
     answer:
-      "Sí. En la página de productos puedes ver los artículos disponibles y su existencia actual.",
+      "Sí. Puedes consultar la disponibilidad de los productos desde la página de productos o contactarnos por WhatsApp.",
   },
   {
+    id: 4,
     question: "¿Aceptan pagos con tarjeta?",
     answer:
-      "No, Solo aceptamos pagos en efectivo y transferencias, según las condiciones disponibles al momento de la compra.",
+      "No. Actualmente solo aceptamos pagos en efectivo y transferencias bancarias.",
   },
   {
+    id: 5,
     question: "¿Cómo puedo contactar servicio al cliente?",
     answer:
-      "Puedes contactarnos desde la sección Servicio al cliente o usando los datos de contacto que aparecen en la parte superior de la página.",
+      "Puedes contactarnos por teléfono, WhatsApp o desde los datos de contacto disponibles en la página.",
   },
   {
-  question: "¿Realizan envíos o delivery?",
-  answer:
-    "Actualmente no contamos con servicio de envío o delivery. Todas las compras deben ser retiradas directamente en nuestra tienda (Pick Up).",
-  }
+    id: 6,
+    question: "¿Realizan envíos o delivery?",
+    answer:
+      "No contamos con servicio de envío o delivery. Las compras deben ser retiradas directamente en Ferreteria Elupina.",
+  },
 ];
+
+function FAQCard({ faq }) {
+  return (
+    <article className="faq-card">
+      <div className="faq-card-icon">
+        <HelpCircle size={24} />
+      </div>
+
+      <div className="faq-card-content">
+        <h2>{faq.question}</h2>
+        <p>{faq.answer}</p>
+      </div>
+    </article>
+  );
+}
+
+function FAQGrid({ items }) {
+  return (
+    <section className="faq-grid">
+      {items.map((faq) => (
+        <FAQCard key={faq.id} faq={faq} />
+      ))}
+    </section>
+  );
+}
 
 export default function FAQ() {
   return (
     <main className="faq-page">
-      <section className="faq-hero">
+      <section className="faq-header">
+        <span>Ayuda</span>
         <h1>Preguntas Frecuentes</h1>
         <p>
-          Aquí encontrarás respuestas rápidas sobre compras, productos,
-          disponibilidad y servicios.
+          Encuentra respuestas rápidas sobre compras, productos, disponibilidad,
+          pagos y servicios de Ferreteria Elupina.
         </p>
       </section>
 
-      <section className="faq-list">
-        {faqs.map((item, index) => (
-          <article className="faq-card" key={index}>
-            <h2>{item.question}</h2>
-            <p>{item.answer}</p>
-          </article>
-        ))}
-      </section>
+      <FAQGrid items={faqItems} />
     </main>
   );
 }

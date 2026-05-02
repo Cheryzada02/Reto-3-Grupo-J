@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Save, X, Layers } from "lucide-react";
+import { PlusSquare, Pencil, Save, X } from "lucide-react";
 
 const departamentosIniciales = [
   "Pisos y Terminaciones",
@@ -22,167 +22,264 @@ const departamentosIniciales = [
 ];
 
 export default function DepartamentosAdmin() {
-  const [departamentos, setDepartamentos] = useState(
-    departamentosIniciales.map((nombre, index) => ({
+  const [departamentosAdminLista, setDepartamentosAdminLista] = useState(
+    departamentosIniciales.map((nombreDepartamento, index) => ({
       id: index + 1,
-      nombre,
+      nombre: nombreDepartamento,
       estado: "Activo",
     }))
   );
 
-  const [nuevoDepartamento, setNuevoDepartamento] = useState("");
-  const [editandoId, setEditandoId] = useState(null);
-  const [nombreEditado, setNombreEditado] = useState("");
+  const [modalDepartamentoAdminAbierto, setModalDepartamentoAdminAbierto] =
+    useState(false);
 
-  const agregarDepartamento = () => {
-    const nombre = nuevoDepartamento.trim();
+  const [departamentoAdminEditando, setDepartamentoAdminEditando] =
+    useState(null);
 
-    if (!nombre) return;
-
-    const nuevo = {
-      id: Date.now(),
-      nombre,
+  const [formularioDepartamentoAdmin, setFormularioDepartamentoAdmin] =
+    useState({
+      nombre: "",
       estado: "Activo",
+    });
+
+  const normalizarNombreDepartamentoAdmin = (nombreDepartamento) => {
+    return nombreDepartamento.trim();
+  };
+
+  const existeDepartamentoAdminDuplicado = (
+    nombreDepartamento,
+    idDepartamentoIgnorado = null
+  ) => {
+    const nombreNormalizado = nombreDepartamento.toLowerCase();
+
+    return departamentosAdminLista.some((departamento) => {
+      const esMismoNombre =
+        departamento.nombre.trim().toLowerCase() === nombreNormalizado;
+
+      const esDepartamentoIgnorado =
+        departamento.id === idDepartamentoIgnorado;
+
+      return esMismoNombre && !esDepartamentoIgnorado;
+    });
+  };
+
+  const abrirModalParaCrearDepartamentoAdmin = () => {
+    setDepartamentoAdminEditando(null);
+    setFormularioDepartamentoAdmin({
+      nombre: "",
+      estado: "Activo",
+    });
+    setModalDepartamentoAdminAbierto(true);
+  };
+
+  const abrirModalParaEditarDepartamentoAdmin = (departamento) => {
+    setDepartamentoAdminEditando(departamento);
+    setFormularioDepartamentoAdmin({
+      nombre: departamento.nombre,
+      estado: departamento.estado,
+    });
+    setModalDepartamentoAdminAbierto(true);
+  };
+
+  const cerrarModalDepartamentoAdmin = () => {
+    setModalDepartamentoAdminAbierto(false);
+    setDepartamentoAdminEditando(null);
+    setFormularioDepartamentoAdmin({
+      nombre: "",
+      estado: "Activo",
+    });
+  };
+
+  const actualizarCampoFormularioDepartamentoAdmin = (evento) => {
+    const { name, value } = evento.target;
+
+    setFormularioDepartamentoAdmin((formularioActual) => ({
+      ...formularioActual,
+      [name]: value,
+    }));
+  };
+
+  const crearDepartamentoAdmin = () => {
+    const nombreDepartamento = normalizarNombreDepartamentoAdmin(
+      formularioDepartamentoAdmin.nombre
+    );
+
+    if (!nombreDepartamento) {
+      alert("El nombre del departamento no puede estar vacío.");
+      return;
+    }
+
+    if (existeDepartamentoAdminDuplicado(nombreDepartamento)) {
+      alert("Ya existe un departamento con ese nombre.");
+      return;
+    }
+
+    const nuevoDepartamento = {
+      id: Date.now(),
+      nombre: nombreDepartamento,
+      estado: formularioDepartamentoAdmin.estado,
     };
 
-    setDepartamentos((prev) => [...prev, nuevo]);
-    setNuevoDepartamento("");
+    setDepartamentosAdminLista((departamentosActuales) => [
+      ...departamentosActuales,
+      nuevoDepartamento,
+    ]);
+
+    cerrarModalDepartamentoAdmin();
   };
 
-  const iniciarEdicion = (departamento) => {
-    setEditandoId(departamento.id);
-    setNombreEditado(departamento.nombre);
-  };
+  const actualizarDepartamentoAdmin = () => {
+    const nombreDepartamento = normalizarNombreDepartamentoAdmin(
+      formularioDepartamentoAdmin.nombre
+    );
 
-  const cancelarEdicion = () => {
-    setEditandoId(null);
-    setNombreEditado("");
-  };
+    if (!nombreDepartamento) {
+      alert("El nombre del departamento no puede estar vacío.");
+      return;
+    }
 
-  const guardarEdicion = (id) => {
-    const nombre = nombreEditado.trim();
+    if (
+      existeDepartamentoAdminDuplicado(
+        nombreDepartamento,
+        departamentoAdminEditando.id
+      )
+    ) {
+      alert("Ya existe otro departamento con ese nombre.");
+      return;
+    }
 
-    if (!nombre) return;
-
-    setDepartamentos((prev) =>
-      prev.map((departamento) =>
-        departamento.id === id
-          ? { ...departamento, nombre }
+    setDepartamentosAdminLista((departamentosActuales) =>
+      departamentosActuales.map((departamento) =>
+        departamento.id === departamentoAdminEditando.id
+          ? {
+              ...departamento,
+              nombre: nombreDepartamento,
+              estado: formularioDepartamentoAdmin.estado,
+            }
           : departamento
       )
     );
 
-    cancelarEdicion();
+    cerrarModalDepartamentoAdmin();
   };
 
-  const eliminarDepartamento = (id) => {
-    const confirmar = window.confirm(
-      "¿Seguro que deseas eliminar este departamento?"
-    );
+  const guardarDepartamentoAdmin = (evento) => {
+    evento.preventDefault();
 
-    if (!confirmar) return;
+    if (departamentoAdminEditando) {
+      actualizarDepartamentoAdmin();
+      return;
+    }
 
-    setDepartamentos((prev) =>
-      prev.filter((departamento) => departamento.id !== id)
-    );
+    crearDepartamentoAdmin();
   };
 
   return (
     <main className="departamentos-admin-page">
-      <section className="departamentos-admin-header">
-        <div>
-          <span>Administración</span>
-          <h1>Departamentos</h1>
-          <p>
-            Gestiona las categorías principales que se mostrarán en la tienda.
-          </p>
-        </div>
+      <div className="page-header-admin">
+        <h1>Departamentos</h1>
 
-        <div className="departamentos-admin-icon">
-          <Layers size={36} />
-        </div>
-      </section>
+        <button
+          type="button"
+          className="btn-agregar"
+          onClick={abrirModalParaCrearDepartamentoAdmin}
+        >
+          <span>
+            <PlusSquare size={19} />
+            Agregar Departamento
+          </span>
+        </button>
+      </div>
 
-      <section className="departamentos-admin-panel">
-        <div className="departamentos-admin-add">
-          <input
-            type="text"
-            placeholder="Nombre del nuevo departamento"
-            value={nuevoDepartamento}
-            onChange={(e) => setNuevoDepartamento(e.target.value)}
-          />
+      <section className="departamentos-admin-grid">
+        {departamentosAdminLista.map((departamento) => (
+          <article className="departamento-admin-card" key={departamento.id}>
+            <h2>
+              Nombre: <span>{departamento.nombre}</span>
+            </h2>
 
-          <button type="button" onClick={agregarDepartamento}>
-            <Plus size={18} />
-            Agregar
-          </button>
-        </div>
+            <p>
+              <strong>Estado:</strong> {departamento.estado}
+            </p>
 
-        <div className="departamentos-admin-table">
-          <div className="departamentos-admin-row departamentos-admin-row-head">
-            <span>ID</span>
-            <span>Nombre</span>
-            <span>Estado</span>
-            <span>Acciones</span>
-          </div>
-
-          {departamentos.map((departamento) => (
-            <div className="departamentos-admin-row" key={departamento.id}>
-              <span>{departamento.id}</span>
-
+            <button
+              type="button"
+              className="btn"
+              onClick={() => abrirModalParaEditarDepartamentoAdmin(departamento)}
+            >
               <span>
-                {editandoId === departamento.id ? (
-                  <input
-                    type="text"
-                    value={nombreEditado}
-                    onChange={(e) => setNombreEditado(e.target.value)}
-                  />
-                ) : (
-                  departamento.nombre
-                )}
+                <Pencil size={19} />
+                Editar
               </span>
-
-              <span className="departamentos-admin-status">
-                {departamento.estado}
-              </span>
-
-              <span className="departamentos-admin-actions">
-                {editandoId === departamento.id ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => guardarEdicion(departamento.id)}
-                    >
-                      <Save size={16} />
-                    </button>
-
-                    <button type="button" onClick={cancelarEdicion}>
-                      <X size={16} />
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => iniciarEdicion(departamento)}
-                    >
-                      <Pencil size={16} />
-                    </button>
-
-                    <button
-                      type="button"
-                      className="departamentos-admin-delete"
-                      onClick={() => eliminarDepartamento(departamento.id)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </>
-                )}
-              </span>
-            </div>
-          ))}
-        </div>
+            </button>
+          </article>
+        ))}
       </section>
+
+      {modalDepartamentoAdminAbierto && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <h2>
+                {departamentoAdminEditando
+                  ? "Editar Departamento"
+                  : "Agregar Departamento"}
+              </h2>
+
+              <button
+                type="button"
+                className="modal-close"
+                onClick={cerrarModalDepartamentoAdmin}
+                aria-label="Cerrar modal"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form className="modal-form" onSubmit={guardarDepartamentoAdmin}>
+              <label>
+                Nombre
+                <input
+                  type="text"
+                  name="nombre"
+                  value={formularioDepartamentoAdmin.nombre}
+                  onChange={actualizarCampoFormularioDepartamentoAdmin}
+                  placeholder="Nombre del departamento"
+                />
+              </label>
+
+              <label>
+                Estado
+                <select
+                  name="estado"
+                  value={formularioDepartamentoAdmin.estado}
+                  onChange={actualizarCampoFormularioDepartamentoAdmin}
+                >
+                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">Inactivo</option>
+                </select>
+              </label>
+
+              <div className="modal-actions">
+                <button type="submit" className="btn">
+                  <span>
+                    <Save size={18} />
+                    Guardar
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-cancelar"
+                  onClick={cerrarModalDepartamentoAdmin}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
