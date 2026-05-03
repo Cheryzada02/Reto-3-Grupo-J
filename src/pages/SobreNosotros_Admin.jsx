@@ -112,7 +112,7 @@ export default function SobreNosotrosAdmin() {
       <section className="page-hero page-header-admin">
         <div>
           <span>Contenido publico</span>
-          <h1>Sobre nosotros</h1>
+          <h1>Sobre Nosotros</h1>
           <p>Edita lo que vera el cliente en la pagina Sobre nosotros.</p>
         </div>
 

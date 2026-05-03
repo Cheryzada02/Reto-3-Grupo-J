@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { get_suppliers, insert_into_suppliers, update_suppliers } from "../authentication/db_functions";
 import { useAlerts } from "../context/AlertContext";
 import {
-  PlusSquareIcon, PencilIcon
+  PlusIcon, PencilIcon
 } from "lucide-react";
 
 function Supplier_card({ supplier, on_edit }) {
@@ -188,7 +188,7 @@ export default function Supplier_page() {
           }}
         >
           <span>
-            <PlusSquareIcon size={18} />
+            <PlusIcon size={18} />
             Agregar Suplidor
           </span>
         </button>

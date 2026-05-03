@@ -59,6 +59,13 @@ export default function Login() {
 
       login(session)
 
+      if (res.role_id === 1) {
+        sessionStorage.setItem(
+          `stock-alert-login-prompt-${res.user_id}`,
+          "pending"
+        );
+      }
+
       if (cartItems?.length > 0 && res.role_id !== 1) {
         navigate("/carrito")  
       }

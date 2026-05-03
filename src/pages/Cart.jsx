@@ -7,6 +7,7 @@ import { check_stock_availablity, get_customer_info, insert_orders, insert_order
 import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
 import { useNavigate } from "react-router-dom";
+import { formatDateOnly, formatTimeOnly } from "../utils/dateFormat";
 
 export default function Cart() {
   const {
@@ -66,8 +67,8 @@ export default function Cart() {
     const doc = new jsPDF();
 
     const numeroFactura = `FE-${Date.now()}`;
-    const fecha = new Date().toLocaleDateString("es-DO");
-    const hora = new Date().toLocaleTimeString("es-DO");
+    const fecha = formatDateOnly();
+    const hora = formatTimeOnly();
 
     doc.setFontSize(20);
     doc.text("Ferreteria Elupina", 14, 18);

@@ -23,6 +23,7 @@ import Customer_page from "./pages/Customers_Admin";
 import PaginaPerfil from "./pages/PaginaPerfil";
 import DepartamentosAdmin from "./pages/Departamentos_Admin";
 import SobreNosotrosAdmin from "./pages/SobreNosotros_Admin";
+import StockAlertsPage from "./pages/Stock_Alerts";
 
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/customers" element={<Customer_page />} />
                 <Route path="/orders" element={<Orders_Page />} />
                 <Route path="/orders_details" element={<Orders_detail_Page />} />
+                <Route path="/stock-alerts" element={<StockAlertsPage />} />
                 <Route path="/sobre-nosotros" element={<SobreNosotrosAdmin />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<Home />} />

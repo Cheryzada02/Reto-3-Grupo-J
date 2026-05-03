@@ -6,10 +6,11 @@ import {
 import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
 import {
-  PlusSquareIcon
+  PlusIcon
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
+import { formatDateTime } from "../utils/dateFormat";
 
 
 // =======================
@@ -26,7 +27,7 @@ function Movement_Row({ movement }) {
 
   return (
     <tr>
-      <td>{new Date(movement.movement_date).toLocaleDateString("es-DO")}</td>
+      <td>{formatDateTime(movement.movement_date)}</td>
       <td>{movement.product_name}</td>
       <td>
         <span className={get_type_class(movement.movement_type)}>
@@ -262,7 +263,7 @@ export default function Inventory_movements() {
           }}
         >
           <span>
-            <PlusSquareIcon size={18} />
+            <PlusIcon size={18} />
             Agregar Movimiento
           </span>
         </button>

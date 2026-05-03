@@ -4,7 +4,7 @@ import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
-import { PencilIcon, PlusSquareIcon } from "lucide-react";
+import { PencilIcon, PlusIcon } from "lucide-react";
 
 function Department_card({ department, on_edit }) {
 
@@ -223,7 +223,7 @@ export default function Departments_page() {
           }}
         >
           <span>
-            <PlusSquareIcon size={18} />
+            <PlusIcon size={18} />
             Agregar Departamento
           </span>
         </button>

@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
+import { formatDateTime } from "../utils/dateFormat";
 
 
 // =======================
@@ -19,24 +20,6 @@ function Order_Details_Row({ order_detail }) {
     }).format(Number(value || 0));
   };
 
-  const Date_Time_Display = ( value ) => {
-
-    const original = new Date(value);
-    const shifted = new Date(original.getTime() - 4 * 60 * 60 * 1000);
-
-    const formatted = new Intl.DateTimeFormat('es-DO', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(shifted);
-
-    return formatted;
-  }
-
   return (
     <tr>
       <td>{order_detail.order_item_id}</td>
@@ -46,8 +29,8 @@ function Order_Details_Row({ order_detail }) {
       <td>{formatCurrency(order_detail.unit_price)}</td>
       <td>{formatCurrency(order_detail.discount)}</td>
       <td>{formatCurrency(order_detail.line_total)}</td>
-      <td>{Date_Time_Display(order_detail.created_at)}</td>
-      <td>{Date_Time_Display(order_detail.updated_at)}</td>
+      <td>{formatDateTime(order_detail.created_at)}</td>
+      <td>{formatDateTime(order_detail.updated_at)}</td>
     </tr>
   );
 }
@@ -102,7 +85,11 @@ export default function Orders_detail_Page() {
   const load_orders_detail = async () => {
     try {
       const data = await get_orders_details();
-      set_orders_detail(data);
+      const sortedDetails = [...(data || [])].sort(
+        (a, b) => Number(b.order_item_id || 0) - Number(a.order_item_id || 0)
+      );
+
+      set_orders_detail(sortedDetails);
     } catch (err) {
       console.error(err.message);
     }
@@ -116,19 +103,23 @@ export default function Orders_detail_Page() {
     setStatusSearch(searchParams.get("status") || "");
   }, [searchParams]);
 
-  const filtered_orders_detail = orders_detail.filter((detail) => {
-    const orderIdSearch = searchParams.get("order_id") || "";
-    const cleanStatusSearch = statusSearch.trim().toLowerCase();
+  const filtered_orders_detail = orders_detail
+    .filter((detail) => {
+      const orderIdSearch = searchParams.get("order_id") || "";
+      const cleanStatusSearch = statusSearch.trim().toLowerCase();
 
-    const matchesOrderId =
-      !orderIdSearch || String(detail.order_id || "") === orderIdSearch;
+      const matchesOrderId =
+        !orderIdSearch || String(detail.order_id || "") === orderIdSearch;
 
-    const matchesStatus =
-      !cleanStatusSearch ||
-      (detail.order_status || "").toLowerCase().includes(cleanStatusSearch);
+      const matchesStatus =
+        !cleanStatusSearch ||
+        (detail.order_status || "").toLowerCase().includes(cleanStatusSearch);
 
-    return matchesOrderId && matchesStatus;
-  });
+      return matchesOrderId && matchesStatus;
+    })
+    .sort(
+      (a, b) => Number(b.order_item_id || 0) - Number(a.order_item_id || 0)
+    );
 
   const handleStatusSearch = (event) => {
     const value = event.target.value;

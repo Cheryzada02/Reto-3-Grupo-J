@@ -1,4 +1,5 @@
 import { Trash2, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
 import { useCart } from "../context/CartContext";
 
@@ -31,30 +32,38 @@ export default function Favoritos() {
         <section className="responsive-grid favorites-grid">
           {favorites.map((product) => (
             <article
-              className="surface-card interactive-card favorite-card"
+              className="surface-card interactive-card client-product-card favorite-card"
               key={product.product_id}
             >
-              <img
-                src={product.image_url || "/placeholder-product.png"}
-                alt={product.product_name}
-                className="favorite-image"
-              />
+              <Link
+                to={`/productos/${product.product_id}`}
+                className="client-product-image favorite-image"
+              >
+                <img
+                  src={product.image_url || "/placeholder-product.png"}
+                  alt={product.product_name}
+                  loading="lazy"
+                />
+              </Link>
 
-              <div className="favorite-info">
-                <h2>{product.product_name}</h2>
+              <div className="client-product-body favorite-info">
+                <Link to={`/productos/${product.product_id}`}>
+                  <h3>{product.product_name}</h3>
+                </Link>
                 <p>{product.description}</p>
 
-                <span className="favorite-price">
+                <div className="client-product-price favorite-price">
                   {formatCurrency(product.sale_price)}
-                </span>
+                </div>
 
                 <div className="favorite-actions">
                   <button
                     type="button"
+                    className="client-product-button"
                     onClick={() => addToCart(product)}
                   >
                     <ShoppingCart size={17} />
-                    Agregar
+                    Agregar al carrito
                   </button>
 
                   <button

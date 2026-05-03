@@ -28,6 +28,11 @@ import {
   get_customer_order_by_customer_id,
   get_customer_order_details_by_order_id
 } from "../authentication/db_functions";
+import {
+  formatDateOnly,
+  formatDateTime,
+  formatTimeOnly,
+} from "../utils/dateFormat";
 
 export default function PaginaPerfil() {
   const { user } = useAuth();
@@ -251,19 +256,6 @@ export default function PaginaPerfil() {
     }).format(Number(value || 0));
   };
 
-  const formatDate = (value) => {
-    if (!value) return "Sin fecha";
-
-    return new Intl.DateTimeFormat("es-DO", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date(value));
-  };
-
   const loadOrderDetails = async (orderId) => {
     if (orderDetails[orderId]) return orderDetails[orderId];
 
@@ -294,12 +286,8 @@ export default function PaginaPerfil() {
 
     const doc = new jsPDF();
     const invoiceNumber = `FE-${order.order_id}`;
-    const createdDate = order.created_at
-      ? new Date(order.created_at).toLocaleDateString("es-DO")
-      : new Date().toLocaleDateString("es-DO");
-    const createdTime = order.created_at
-      ? new Date(order.created_at).toLocaleTimeString("es-DO")
-      : new Date().toLocaleTimeString("es-DO");
+    const createdDate = formatDateOnly(order.created_at);
+    const createdTime = formatTimeOnly(order.created_at);
 
     doc.setFontSize(20);
     doc.text("Ferreteria Elupina", 14, 18);
@@ -708,7 +696,7 @@ export default function PaginaPerfil() {
 
                           <div>
                             <span>Fecha</span>
-                            <strong>{formatDate(order.created_at)}</strong>
+                            <strong>{formatDateTime(order.created_at)}</strong>
                           </div>
 
                           <div>

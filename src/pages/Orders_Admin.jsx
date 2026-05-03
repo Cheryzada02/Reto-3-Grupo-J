@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
+import { formatDateTime } from "../utils/dateFormat";
 
 
 // =======================
@@ -27,19 +28,6 @@ function Order_Row({
       style: "currency",
       currency: "DOP",
     }).format(Number(value || 0));
-  };
-
-  const date_time_display = (value) => {
-    const original = new Date(value);
-    return new Intl.DateTimeFormat('es-DO', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    }).format(original);
   };
 
   return (
@@ -83,7 +71,7 @@ function Order_Row({
       <td>{format_currency(order.tax)}</td>
       <td>{format_currency(order.discount)}</td>
       <td>{format_currency(order.total)}</td>
-      <td>{date_time_display(order.created_at)}</td>
+      <td>{formatDateTime(order.created_at)}</td>
 
       <td className="table-actions">
         {is_editing ? (
@@ -194,7 +182,11 @@ export default function Orders_Page() {
   const load_orders = async () => {
     try {
       const data = await get_orders();
-      set_orders(data);
+      const sortedOrders = [...(data || [])].sort(
+        (a, b) => Number(b.order_id || 0) - Number(a.order_id || 0)
+      );
+
+      set_orders(sortedOrders);
     } catch (err) {
       console.error(err.message);
     }
@@ -215,9 +207,11 @@ export default function Orders_Page() {
       await update_orders(edit_values.order_id, edit_values.order_status, edit_values.payment_status);
 
       set_orders(prev =>
-        prev.map(o =>
-          o.order_id === edit_row_id ? { ...o, ...edit_values } : o
-        )
+        prev
+          .map(o =>
+            o.order_id === edit_row_id ? { ...o, ...edit_values } : o
+          )
+          .sort((a, b) => Number(b.order_id || 0) - Number(a.order_id || 0))
       );
 
       set_edit_row_id(null);

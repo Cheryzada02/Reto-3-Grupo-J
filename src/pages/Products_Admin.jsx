@@ -4,7 +4,7 @@ import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
-import { PencilIcon, PlusSquareIcon, Search } from "lucide-react";
+import { PencilIcon, PlusIcon, Search } from "lucide-react";
 
 function Product_card({ product, on_edit }) {
 
@@ -333,7 +333,7 @@ export default function Products_page() {
           }}
         >
           <span>
-            <PlusSquareIcon size={18} />
+            <PlusIcon size={18} />
             Agregar Producto
           </span>
         </button>
