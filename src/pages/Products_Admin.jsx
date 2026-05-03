@@ -36,7 +36,7 @@ function Product_card({ product, on_edit }) {
         <div className="admin-product-fields">
           <p className="product-info"><strong>Descripcion</strong> <span>{product.description}</span></p>
           <p className="product-info"><strong>Suplidor</strong> <span>{product.supplier_name}</span></p>
-          <p className="product-info"><strong>Departamento</strong> <span>{product.depar || "Sin departamento"}</span></p>
+          <p className="product-info"><strong>Departamento</strong> <span>{product.department_name || "Sin departamento"}</span></p>
           <p className="product-info"><strong>Precio Costo</strong><span>{formatCurrency(product.cost_price)}</span></p>
           <p className="product-info"><strong>Precio Venta</strong><span>{formatCurrency(product.sale_price)}</span></p>
           <p className="product-info"><strong>Stock</strong><span>{product.current_stock}</span></p>
@@ -218,9 +218,9 @@ function Product_Form({ product, on_save, on_close }) {
             onChange={handle_change} >
           
           <option value="">-- Seleccione un Departamento --</option>
-          {suppliers.map((s) => (
+          {departments.map((s) => (
             <option key={s.department_id} value={s.department_id}>
-              {s.name}
+              {s.department_name}
             </option>
           ))}
         </select>
