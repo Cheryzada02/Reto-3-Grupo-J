@@ -91,12 +91,6 @@ export default function ProductoDetalle() {
 
       <section className="product-detail-layout">
         <div className="product-detail-gallery">
-          <div className="product-thumbs">
-            <img src={producto.image_url} alt={producto.product_name} />
-            <img src={producto.image_url} alt={producto.product_name} />
-            <img src={producto.image_url} alt={producto.product_name} />
-          </div>
-
           <div className="product-main-image">
             <span className="offer-badge">Oferta</span>
 

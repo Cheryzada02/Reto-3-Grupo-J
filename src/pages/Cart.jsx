@@ -22,7 +22,6 @@ export default function Cart() {
   const [loading, set_loading] = useState(false)
   const {user} = useAuth();
   const { showAlert } = useAlerts();
-  const [customer, set_customer] = useState([]);
   const navigate = useNavigate();
 
   const taxRate = 0.18;
@@ -137,6 +136,12 @@ export default function Cart() {
   };
 
   const confirmOrder = async () => {
+    if (cartItems.length === 0) {
+      setShowCheckoutDetail(false);
+      showAlert("El carrito está vacío.", "error");
+      return;
+    }
+
     set_loading(true);
     let errors = false
 
@@ -151,15 +156,26 @@ export default function Cart() {
         }
       }
     }
+
+    if (errors) {
+      set_loading(false);
+      return;
+    }
     
     if (!errors) {
 
       try {
         const response_customer = await get_customer_info(user.user_id)
-        set_customer(response_customer)
+        const customerData = Array.isArray(response_customer) ? response_customer[0] : response_customer
+
+        if (!customerData?.customer_id) {
+          showAlert("No se pudo encontrar la informacion del cliente.", "error");
+          set_loading(false);
+          return;
+        }
 
         try {
-          const response_order = await insert_orders(customer.customer_id, user.user_id, "Online", subtotal, tax, 0, total)
+          const response_order = await insert_orders(customerData.customer_id, user.user_id, "Online", subtotal, tax, 0, total)
 
           for (const item of cartItems) { 
             try {
@@ -187,7 +203,7 @@ export default function Cart() {
         generarFacturaProvisionalPDF();
     
         clearCart();
-        setShowCheckoutDetail(true);
+        setShowCheckoutDetail(false);
         set_loading(false);
       }
     }
@@ -345,7 +361,7 @@ export default function Cart() {
         </section>
       )}
 
-      {showCheckoutDetail && (
+      {showCheckoutDetail && cartItems.length > 0 && (
         <section className="checkout-modal-overlay">
           <div className="checkout-modal">
             <button
