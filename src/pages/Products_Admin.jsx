@@ -299,6 +299,7 @@ export default function Products_page() {
       }
 
       await load_products();
+      window.dispatchEvent(new Event("stock-alerts-updated"));
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {

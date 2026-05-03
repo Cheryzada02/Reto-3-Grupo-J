@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
-  Bell,
   User,
   Heart,
   ShoppingCart,
@@ -9,7 +8,6 @@ import {
   Headphones,
   ChevronDown,
   LogOut,
-  X,
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
@@ -19,18 +17,14 @@ import ProductSearch from "./ProductSearch";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-
   const [departamentos, set_departamentos] = useState([]);
-
   const [showDepartments, setShowDepartments] = useState(false);
-  const [isNotificationsOpen, set_is_notifications_open] = useState(false);
   const [profileImage, setProfileImage] = useState("");
 
   const navigate = useNavigate();
   const { cartCount } = useCart();
 
   const isLoggedIn = Boolean(user?.role_id);
-
   const profileLink = isLoggedIn ? "/perfil" : "/login";
   const userName = isLoggedIn ? user.user_name : "Acceder";
 
@@ -57,7 +51,6 @@ export default function Navbar() {
     try {
       const data = await get_departments();
       set_departamentos(data);
-      
     } catch (err) {
       console.error(err.message);
     }
@@ -65,7 +58,7 @@ export default function Navbar() {
 
   useEffect(() => {
     load_departments();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     if (!user?.user_id) {
@@ -124,18 +117,6 @@ export default function Navbar() {
         <ProductSearch />
 
         <div className="navbar-actions">
-          <button
-            type="button"
-            className="navbar-action notification-button"
-            onClick={() => set_is_notifications_open(true)}
-            aria-label="Abrir notificaciones"
-          >
-            <Bell size={24} />
-            <span>
-              <strong>Notificaciones</strong>
-            </span>
-          </button>
-
           <Link to={profileLink} className="navbar-action">
             {isLoggedIn && profileImage ? (
               <img
@@ -246,47 +227,7 @@ export default function Navbar() {
         >
           Sobre nosotros
         </NavLink>
-
       </nav>
-
-      <div
-        className={
-          isNotificationsOpen
-            ? "notification-overlay open"
-            : "notification-overlay"
-        }
-        onClick={() => set_is_notifications_open(false)}
-        aria-hidden={!isNotificationsOpen}
-      />
-
-      <aside
-        className={
-          isNotificationsOpen
-            ? "notification-panel open"
-            : "notification-panel"
-        }
-        aria-label="Panel de notificaciones"
-        aria-hidden={!isNotificationsOpen}
-      >
-        <div className="notification-panel-header">
-          <div>
-            <span>Panel</span>
-            <h2>Notificaciones</h2>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => set_is_notifications_open(false)}
-            aria-label="Cerrar notificaciones"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="notification-panel-body">
-          <p>Las notificaciones aparecerán aquí.</p>
-        </div>
-      </aside>
     </header>
   );
 }

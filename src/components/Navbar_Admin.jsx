@@ -12,9 +12,19 @@ import {
 
 import { useAuth } from "../context/AuthContext";
 import ProductSearch from "./ProductSearch";
-import { get_stock_alerts } from "../authentication/db_functions";
+import { get_products, get_stock_alerts } from "../authentication/db_functions";
+
+const STOCK_ALERTS_UPDATED_EVENT = "stock-alerts-updated";
+
+function getThresholdValue(alert) {
+  return Number(alert.thershold_value ?? alert.threshold_value ?? Number.POSITIVE_INFINITY);
+}
 
 function isStockAlertResolved(alert) {
+  if (typeof alert.computed_resolved === "boolean") {
+    return alert.computed_resolved;
+  }
+
   const value = alert.is_resolved;
 
   if (typeof value === "string") {
@@ -50,28 +60,79 @@ export default function Navbar_Admin() {
   useEffect(() => {
     if (user?.role_id !== 1) return;
 
-    const loadStockAlerts = async () => {
+    let isMounted = true;
+
+    const loadStockAlerts = async ({ showLoginPrompt = false } = {}) => {
       try {
-        const data = await get_stock_alerts();
-        const alerts = data || [];
+        const [alertsData, productsData] = await Promise.all([
+          get_stock_alerts(),
+          get_products(),
+        ]);
+
+        if (!isMounted) return;
+
+        const productsById = new Map(
+          (productsData || []).map((product) => [
+            Number(product.product_id),
+            product,
+          ])
+        );
+
+        const alerts = (alertsData || []).map((alert) => {
+          const product = productsById.get(Number(alert.product_id));
+          const currentStock = Number(
+            product?.current_stock ?? alert.current_value ?? 0
+          );
+          const threshold = getThresholdValue(alert);
+
+          return {
+            ...alert,
+            current_value: currentStock,
+            computed_resolved:
+              isStockAlertResolved(alert) || currentStock >= threshold,
+          };
+        });
+
         const unresolved = alerts.filter((alert) => !isStockAlertResolved(alert));
         const promptKey = `stock-alert-login-prompt-${user.user_id}`;
 
         set_stock_alerts(alerts);
 
         if (
+          showLoginPrompt &&
           unresolved.length > 0 &&
           sessionStorage.getItem(promptKey) === "pending"
         ) {
           set_is_stock_prompt_open(true);
           sessionStorage.setItem(promptKey, "shown");
         }
+
+        if (!unresolved.length) {
+          set_is_stock_prompt_open(false);
+        }
       } catch (error) {
         console.error("Error cargando alertas de stock:", error.message);
       }
     };
 
-    loadStockAlerts();
+    loadStockAlerts({ showLoginPrompt: true });
+
+    const handleStockAlertsUpdated = () => {
+      loadStockAlerts();
+    };
+
+    window.addEventListener(STOCK_ALERTS_UPDATED_EVENT, handleStockAlertsUpdated);
+
+    const refreshInterval = window.setInterval(loadStockAlerts, 30000);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener(
+        STOCK_ALERTS_UPDATED_EVENT,
+        handleStockAlertsUpdated
+      );
+      window.clearInterval(refreshInterval);
+    };
   }, [user]);
 
   const openStockAlertsPage = () => {

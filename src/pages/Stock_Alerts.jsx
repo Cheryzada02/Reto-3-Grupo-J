@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Search } from "lucide-react";
 
-import { get_stock_alerts } from "../authentication/db_functions";
+import { get_products, get_stock_alerts } from "../authentication/db_functions";
 import { formatDateTime } from "../utils/dateFormat";
 
 function formatAlertType(type) {
@@ -19,6 +19,9 @@ function getThresholdValue(alert) {
 }
 
 function isAlertResolved(alert) {
+  if (typeof alert.computed_resolved === "boolean") {
+    return alert.computed_resolved;
+  }
   
   const value = alert.is_resolved;
 
@@ -65,8 +68,35 @@ export default function StockAlertsPage() {
   useEffect(() => {
     const loadAlerts = async () => {
       try {
-        const data = await get_stock_alerts();
-        setAlerts(data || []);
+        const [alertsData, productsData] = await Promise.all([
+          get_stock_alerts(),
+          get_products(),
+        ]);
+
+        const productsById = new Map(
+          (productsData || []).map((product) => [
+            Number(product.product_id),
+            product,
+          ])
+        );
+
+        const refreshedAlerts = (alertsData || []).map((alert) => {
+          const product = productsById.get(Number(alert.product_id));
+          const currentStock = Number(
+            product?.current_stock ?? alert.current_value ?? 0
+          );
+          const threshold = Number(
+            alert.thershold_value ?? alert.threshold_value ?? Number.POSITIVE_INFINITY
+          );
+
+          return {
+            ...alert,
+            current_value: currentStock,
+            computed_resolved: isAlertResolved(alert) || currentStock >= threshold,
+          };
+        });
+
+        setAlerts(refreshedAlerts);
       } catch (error) {
         console.error("Error cargando alertas de stock:", error.message);
       } finally {
@@ -75,6 +105,12 @@ export default function StockAlertsPage() {
     };
 
     loadAlerts();
+
+    window.addEventListener("stock-alerts-updated", loadAlerts);
+
+    return () => {
+      window.removeEventListener("stock-alerts-updated", loadAlerts);
+    };
   }, []);
 
   const unresolvedAlerts = alerts.filter((alert) => !isAlertResolved(alert));

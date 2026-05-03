@@ -237,8 +237,8 @@ export default function Inventory_movements() {
         );
         showAlert("Movimiento agregado correctamente.", "success");
 
-
         await load_movements();
+        window.dispatchEvent(new Event("stock-alerts-updated"));
 
     } catch (err) {
       console.error(err.message);
