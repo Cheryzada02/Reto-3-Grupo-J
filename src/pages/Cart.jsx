@@ -5,6 +5,7 @@ import autoTable from "jspdf-autotable";
 import { useCart } from "../context/CartContext";
 import { check_stock_availablity, get_customer_info, insert_orders, insert_orders_items } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
+import { useAlerts } from "../context/AlertContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Cart() {
@@ -20,6 +21,7 @@ export default function Cart() {
   const [showCheckoutDetail, setShowCheckoutDetail] = useState(false);
   const [loading, set_loading] = useState(false)
   const {user} = useAuth();
+  const { showAlert } = useAlerts();
   const [customer, set_customer] = useState([]);
   const navigate = useNavigate();
 
@@ -122,7 +124,7 @@ export default function Cart() {
 
   const handleCheckout = () => {
     if (cartItems.length === 0) {
-      alert("El carrito está vacío.");
+      showAlert("El carrito está vacío.", "error");
       return;
     }
 
@@ -144,7 +146,7 @@ export default function Cart() {
         const response = await check_stock_availablity(item.product_id, item.quantity)
       } catch (error) {
         if (error.message === "No Hay Stock Suficiente") {
-          alert("No Hay Stock Suficiente Para Producto: " + item.product_name);
+          showAlert("No Hay Stock Suficiente Para Producto: " + item.product_name, "error");
           errors = true
         }
       }
@@ -172,8 +174,7 @@ export default function Cart() {
         console.log(error)
       }
 
-      alert(
-        "Orden confirmada correctamente. Se generó una factura provisional en PDF.");
+      showAlert("Orden confirmada correctamente. Se generó una factura provisional en PDF.", "success");
 
       generarFacturaProvisionalPDF();
   
@@ -185,7 +186,7 @@ export default function Cart() {
   };
 
   return (
-    <main className="cart-page">
+    <main className="page-shell cart-page">
       <section className="cart-header">
         <h1>Carrito de compra</h1>
         <p>
@@ -195,7 +196,7 @@ export default function Cart() {
       </section>
 
       {cartItems.length === 0 ? (
-        <section className="cart-empty">
+        <section className="surface-card empty-state cart-empty">
           <h2>Tu carrito está vacío</h2>
           <p>Agrega productos para continuar con tu compra.</p>
         </section>
@@ -203,7 +204,7 @@ export default function Cart() {
         <section className="cart-layout">
           <div className="cart-items">
             {cartItems.map((item) => (
-              <article className="cart-item" key={item.product_id}>
+              <article className="surface-card cart-item" key={item.product_id}>
                 <img
                   src={item.image_url || "/placeholder-product.png"}
                   alt={item.product_name}
@@ -252,7 +253,7 @@ export default function Cart() {
             ))}
           </div>
 
-          <aside className="checkout-box">
+          <aside className="surface-card checkout-box">
             <h2>Resumen de compra</h2>
 
             <div className="checkout-row">

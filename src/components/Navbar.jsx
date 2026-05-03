@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
-  Search,
   User,
   Heart,
   ShoppingCart,
@@ -11,16 +10,17 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { departamentos } from "../data/departamentos";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import "./Navbar.css";
+import { get_departments } from "../authentication/db_functions";
+import ProductSearch from "./ProductSearch";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
 
+  const [departamentos, set_departamentos] = useState([]);
+
   const [showDepartments, setShowDepartments] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const navigate = useNavigate();
   const { cartCount } = useCart();
@@ -40,26 +40,37 @@ export default function Navbar() {
 
   const handleViewAllProducts = (e) => {
     e.stopPropagation();
-    setShowDepartments(false);
     navigate("/productos");
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-
-    const cleanSearch = searchTerm.trim();
-
-    if (!cleanSearch) {
-      navigate("/productos");
-      return;
-    }
-
-    navigate(`/productos?buscar=${encodeURIComponent(cleanSearch)}`);
+    closeDepartments();
   };
 
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const load_departments = async () => {
+    try {
+      const data = await get_departments();
+      set_departamentos(data);
+      
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    load_departments();
+  }, []); 
+
+  const crearRutaDepartamento = (texto) => {
+    return texto
+      ?.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ñ/g, "n")
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]/g, "");
   };
 
   return (
@@ -87,18 +98,7 @@ export default function Navbar() {
           Ferreteria Elupina
         </Link>
 
-        <form className="navbar-search" onSubmit={handleSearch}>
-          <input
-            type="text"
-            placeholder="Buscar en la tienda..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-
-          <button type="submit" aria-label="Buscar productos">
-            <Search size={22} />
-          </button>
-        </form>
+        <ProductSearch />
 
         <div className="navbar-actions">
           <Link to={profileLink} className="navbar-action">
@@ -157,11 +157,11 @@ export default function Navbar() {
             <div className="department-dropdown">
               {departamentos.map((departamento) => (
                 <Link
-                  key={departamento.id}
-                  to={departamento.ruta}
+                  key={departamento.department_id}
+                  to={`/departamentos/${crearRutaDepartamento(departamento.department_name)}`}
                   onClick={closeDepartments}
                 >
-                  {departamento.nombre}
+                  {departamento.department_name}
                 </Link>
               ))}
             </div>
@@ -177,13 +177,6 @@ export default function Navbar() {
         </NavLink>
 
         <NavLink
-          to="/servicio-cliente"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Soporte
-        </NavLink>
-
-        <NavLink
           to="/productos"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
@@ -196,6 +189,14 @@ export default function Navbar() {
         >
           Perfil
         </NavLink>
+
+        <NavLink
+          to="/servicio-cliente"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Soporte
+        </NavLink>
+
       </nav>
     </header>
   );

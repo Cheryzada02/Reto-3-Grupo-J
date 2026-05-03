@@ -24,6 +24,8 @@ import DepartamentosAdmin from "./pages/Departamentos_Admin";
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { FavoritesProvider } from "./context/FavoritesContext";
+import Orders_Page from "./pages/Orders_Admin";
+import Orders_detail_Page from "./pages/Orders_Details_Admin";
 
 function App() {
   const { user } = useAuth();
@@ -39,14 +41,13 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/productos" element={<ProductsPage />} />
+                <Route path="/productos/:id" element={<ProductoDetalle />} />
                 <Route path="/departamentos" element={<DepartamentosAdmin />} />
                 <Route path="/suplidores" element={<SupplierPage />} />
-                <Route
-                  path="/inventory_movements"
-                  element={<Inventory_movements />}
-                />
+                <Route path="/inventory_movements" element={<Inventory_movements />}/>
                 <Route path="/customers" element={<Customer_page />} />
-                <Route path="/perfil" element={<PaginaPerfil />} />
+                <Route path="/orders" element={<Orders_Page />} />
+                <Route path="/orders_details" element={<Orders_detail_Page />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="*" element={<Home />} />
               </Routes>
@@ -66,6 +67,7 @@ function App() {
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/productos" element={<ProductosPagina />} />
                 <Route path="/productos/:id" element={<ProductoDetalle />} />
+                <Route path="/departamentos/:departamentoRuta" element={<ProductosPagina />} />
                 <Route path="/carrito" element={<Cart />} />
                 <Route path="/favoritos" element={<Favoritos />} />
                 <Route path="*" element={<Home />} />

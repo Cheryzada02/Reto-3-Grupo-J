@@ -4,6 +4,7 @@ import {
   get_products,
 } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
+import { useAlerts } from "../context/AlertContext";
 import {
   PlusSquareIcon
 } from "lucide-react";
@@ -14,7 +15,7 @@ import { useState, useEffect } from "react";
 // =======================
 // TABLE ROW
 // =======================
-function Movement_Row({ movement, on_edit }) {
+function Movement_Row({ movement }) {
 
   const get_type_class = (type) => {
     if (type === "ENTRADA") return "tag tag-green";
@@ -46,12 +47,12 @@ function Movement_Row({ movement, on_edit }) {
 // =======================
 // TABLE
 // =======================
-function Movement_Table({ movements, on_edit }) {
+function Movement_Table({ movements }) {
   if (!movements.length) return <p>Cargando...</p>;
 
   return (
-    <div className="table-container">
-      <table className="table">
+    <div className="table-container admin-table-container">
+      <table className="table admin-table inventory-table">
         <thead>
           <tr>
             <th>Fecha</th>
@@ -70,7 +71,6 @@ function Movement_Table({ movements, on_edit }) {
             <Movement_Row
               key={m.movement_id}
               movement={m}
-              on_edit={on_edit}
             />
           ))}
         </tbody>
@@ -86,6 +86,7 @@ function Movement_Table({ movements, on_edit }) {
 function Movement_Form({ movement, on_save, on_close }) {
 
     const { user } = useAuth();
+    const { showAlert } = useAlerts();
     
     const [form, set_form] = useState({
         product_id: "",
@@ -121,9 +122,9 @@ function Movement_Form({ movement, on_save, on_close }) {
     };
 
     const handle_submit = async () => {
-        if (!form.product_id) return alert("Producto requerido");
-        if (!form.movement_type) return alert("Tipo requerido");
-        if (Number(form.quantity) <= 0) return alert("Cantidad inválida");
+        if (!form.product_id) return showAlert("Producto requerido", "error");
+        if (!form.movement_type) return showAlert("Tipo requerido", "error");
+        if (Number(form.quantity) <= 0) return showAlert("Cantidad inválida", "error");
 
         let user_id = user.user_id;
 
@@ -146,7 +147,7 @@ function Movement_Form({ movement, on_save, on_close }) {
     return (
         <div className="modal-overlay">
             <div className="modal">
-                <h2>{movement ? "Edit Movement" : "New Movement"}</h2>
+                <h2>{movement ? "Editar Movimiento" : "Nuevo Movimiento"}</h2>
 
                 <select name="product_id" value={form.product_id} onChange={handle_change}>
                 <option value="">-- Producto --</option>
@@ -207,6 +208,7 @@ export default function Inventory_movements() {
   const [movements, set_movements] = useState([]);
   const [selected, set_selected] = useState(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const { showAlert } = useAlerts();
 
   const load_movements = async () => {
     try {
@@ -232,7 +234,7 @@ export default function Inventory_movements() {
             data.reference,
             data.notes
         );
-        alert("Movement added!");
+        showAlert("Movement added!", "success");
 
 
         await load_movements();
@@ -243,10 +245,14 @@ export default function Inventory_movements() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-shell page-container">
 
-      <div className="page-header-admin">
-        <h1>Movimientos De Inventario</h1>
+      <div className="page-hero page-header-admin">
+        <div>
+          <span>Administración</span>
+          <h1>Movimientos De Inventario</h1>
+          <p>Registra entradas, salidas y ajustes para mantener el inventario claro.</p>
+        </div>
 
         <button
           className="btn-primary"
@@ -264,10 +270,6 @@ export default function Inventory_movements() {
 
       <Movement_Table
         movements={movements}
-        on_edit={(m) => {
-          set_selected(m);
-          set_is_modal_open(true);
-        }}
       />
 
       {is_modal_open && (

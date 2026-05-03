@@ -14,7 +14,7 @@ export default function Favoritos() {
   };
 
   return (
-    <main className="favorites-page">
+    <main className="page-shell favorites-page">
       <section className="favorites-header">
         <h1>Mis favoritos</h1>
         <p>
@@ -23,14 +23,17 @@ export default function Favoritos() {
       </section>
 
       {favorites.length === 0 ? (
-        <section className="favorites-empty">
+        <section className="surface-card empty-state favorites-empty">
           <h2>No tienes productos favoritos</h2>
           <p>Explora nuestros productos y agrega tus artículos preferidos.</p>
         </section>
       ) : (
-        <section className="favorites-grid">
+        <section className="responsive-grid favorites-grid">
           {favorites.map((product) => (
-            <article className="favorite-card" key={product.product_id}>
+            <article
+              className="surface-card interactive-card favorite-card"
+              key={product.product_id}
+            >
               <img
                 src={product.image_url || "/placeholder-product.png"}
                 alt={product.product_name}

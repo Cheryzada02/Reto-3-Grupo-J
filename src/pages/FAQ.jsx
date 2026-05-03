@@ -41,7 +41,7 @@ const faqItems = [
 
 function FAQCard({ faq }) {
   return (
-    <article className="faq-card">
+    <article className="surface-card interactive-card faq-card">
       <div className="faq-card-icon">
         <HelpCircle size={24} />
       </div>
@@ -56,7 +56,7 @@ function FAQCard({ faq }) {
 
 function FAQGrid({ items }) {
   return (
-    <section className="faq-grid">
+    <section className="responsive-grid faq-grid">
       {items.map((faq) => (
         <FAQCard key={faq.id} faq={faq} />
       ))}
@@ -66,7 +66,7 @@ function FAQGrid({ items }) {
 
 export default function FAQ() {
   return (
-    <main className="faq-page">
+    <main className="page-shell faq-page">
       <section className="faq-header">
         <span>Ayuda</span>
         <h1>Preguntas Frecuentes</h1>

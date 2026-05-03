@@ -1,18 +1,22 @@
+import { useState } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
-  Search,
+  Bell,
   User,
   Mail,
   Headphones,
   LogOut,
+  X,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
-import "./Navbar.css";
+import ProductSearch from "./ProductSearch";
+
 
 export default function Navbar_Admin() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isNotificationsOpen, set_is_notifications_open] = useState(false);
 
   const isLoggedIn = Boolean(user?.role_id);
 
@@ -52,15 +56,21 @@ export default function Navbar_Admin() {
           Ferretería Elupina Admin
         </Link>
 
-        <form className="navbar-search">
-          <input type="text" placeholder="Buscar en la tienda..." />
-
-          <button type="submit">
-            <Search size={22} />
-          </button>
-        </form>
+        <ProductSearch />
 
         <div className="navbar-actions">
+          <button
+            type="button"
+            className="navbar-action notification-button"
+            onClick={() => set_is_notifications_open(true)}
+            aria-label="Abrir notificaciones"
+          >
+            <Bell size={24} />
+            <span>
+              <strong>Notificaciones</strong>
+            </span>
+          </button>
+
           <Link to={login} className="navbar-action">
             <User size={28} />
 
@@ -128,7 +138,61 @@ export default function Navbar_Admin() {
         >
           Clientes
         </NavLink>
+
+        <NavLink
+          to="/orders"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Ordenes
+        </NavLink>
+
+        <NavLink
+          to="/orders_details"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Detalle Ordenes
+        </NavLink>
+
       </nav>
+
+      <div
+        className={
+          isNotificationsOpen
+            ? "notification-overlay open"
+            : "notification-overlay"
+        }
+        onClick={() => set_is_notifications_open(false)}
+        aria-hidden={!isNotificationsOpen}
+      />
+
+      <aside
+        className={
+          isNotificationsOpen
+            ? "notification-panel open"
+            : "notification-panel"
+        }
+        aria-label="Panel de notificaciones"
+        aria-hidden={!isNotificationsOpen}
+      >
+          <div className="notification-panel-header">
+            <div>
+              <span>Panel</span>
+              <h2>Notificaciones</h2>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => set_is_notifications_open(false)}
+              aria-label="Cerrar notificaciones"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="notification-panel-body">
+            <p>Las notificaciones aparecerán aquí.</p>
+          </div>
+      </aside>
     </header>
   );
 }

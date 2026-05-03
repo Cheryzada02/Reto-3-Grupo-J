@@ -28,8 +28,8 @@ export default function PaginaPerfil() {
 
   if (!user) {
     return (
-      <main className="perfil-page">
-        <section className="perfil-empty-card">
+      <main className="page-shell perfil-page">
+        <section className="surface-card empty-state perfil-empty-card">
           <h1>No has iniciado sesión</h1>
           <p>Debes iniciar sesión para ver tu perfil.</p>
         </section>
@@ -97,8 +97,8 @@ export default function PaginaPerfil() {
     user.role_id === 1 ? "Administrador" : "Cliente";
 
   return (
-    <main className="perfil-page">
-      <section className="perfil-hero">
+    <main className="page-shell perfil-page">
+      <section className="page-hero perfil-hero">
         <div>
           <span>Cuenta de usuario</span>
           <h1>Mi perfil</h1>
@@ -110,7 +110,7 @@ export default function PaginaPerfil() {
       </section>
 
       <section className="perfil-layout">
-        <aside className="perfil-sidebar">
+        <aside className="surface-card perfil-sidebar">
           <div className="perfil-avatar-box">
             <img
               src="https://i.pravatar.cc/150?img=12"
@@ -136,7 +136,7 @@ export default function PaginaPerfil() {
         </aside>
 
         <section className="perfil-content">
-          <article className="perfil-card">
+          <article className="surface-card perfil-card">
             <div className="perfil-card-header">
               <div>
                 <h2>Información del usuario</h2>
@@ -165,7 +165,7 @@ export default function PaginaPerfil() {
             </div>
           </article>
 
-          <article className="perfil-card">
+          <article className="surface-card perfil-card">
             <div className="perfil-card-header">
               <div>
                 <h2>Cambiar contraseña</h2>

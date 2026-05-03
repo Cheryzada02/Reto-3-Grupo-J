@@ -6,7 +6,7 @@ import {
 
 function Customer_card({ customer, on_edit }) {
   return (
-    <div className="product-card">
+    <div className="surface-card interactive-card product-card">
 
       <div className="product-image">
         {customer.image_url ? (
@@ -55,7 +55,7 @@ function Customer_List({ customers, on_edit }) {
   if (!customers.length) return <p>Cargando Clientes...</p>;
 
   return (
-    <div className="products-grid">
+    <div className="responsive-grid product-grid products-grid">
       {customers.map(customer => (
         <Customer_card
           key={customer.customer_id}
@@ -86,10 +86,14 @@ export default function Customer_page() {
 
 
   return (
-    <div className="page-container">
+    <div className="page-shell page-container">
 
-      <div className="page-header-admin">
-        <h1>Clientes</h1>
+      <div className="page-hero page-header-admin">
+        <div>
+          <span>Administración</span>
+          <h1>Clientes</h1>
+          <p>Consulta los datos de clientes registrados y su actividad reciente.</p>
+        </div>
       </div>
 
       <Customer_List

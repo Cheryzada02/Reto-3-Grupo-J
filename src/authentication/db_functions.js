@@ -24,15 +24,6 @@ export async function login_user_profile (email, password) {
     return data
 }
 
-// View to See Departments
-export async function get_departments () {
-    const {data, error} = await supabase.from('view_departments').select('*')
-    if (error) throw error
-
-    return data
-}
-
-
 // View to See Suppliers
 export async function get_suppliers () {
     const {data, error} = await supabase.from('view_suppliers').select('*')
@@ -115,9 +106,9 @@ export async function update_products(id, name, description, supplier_id, cost_p
 }
 
 // Upload Image
-export async function upload_image(file) {
+export async function upload_image(file, bucked_name) {
 
-    const fileName = `Products/${Date.now()}-${file.name}`;
+    const fileName = `${bucked_name}/${Date.now()}-${file.name}`;
 
     const { data, error } = await supabase.storage
         .from("ferreteriard-images")
@@ -260,6 +251,65 @@ export async function insert_orders_items(order_id, product_id, quantity, unit_p
     p_discount: discount,
     p_line_total: line_total,
     p_user_id: user_id
+    })
+    if (error) throw error
+
+    return data
+}
+
+// View to See Products
+export async function get_departments () {
+    const {data, error} = await supabase.from('view_departments').select('*')
+    if (error) throw error
+
+    return data
+}
+
+// Insert Departments 
+export async function insert_into_departments(name, image_url) {
+    const {data, error} = await supabase.rpc("insert_department", {
+    p_name: name,
+    p_image_url: image_url
+    })
+    if (error) throw error
+
+    return data
+}
+
+//Update departments
+export async function update_departments(id, name, image_url) {
+    const {data, error} = await supabase.rpc("update_department", {
+    p_id: id,
+    p_name: name,
+    p_image_url: image_url
+    })
+    if (error) throw error
+
+    return data
+}
+
+// View to See Orders
+export async function get_orders () {
+    const {data, error} = await supabase.from('view_orders').select('*')
+    if (error) throw error
+
+    return data
+}
+
+// View to See Orders Details
+export async function get_orders_details () {
+    const {data, error} = await supabase.from('view_orders_details').select('*')
+    if (error) throw error
+
+    return data
+}
+
+// Update Orders Status
+export async function update_orders(id, order_status, payment_status) {
+    const {data, error} = await supabase.rpc("update_orders", {
+    p_order_id: id,
+    p_order_status: order_status,
+    p_payment_status: payment_status
     })
     if (error) throw error
 

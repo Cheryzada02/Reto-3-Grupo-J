@@ -107,7 +107,7 @@ export default function ProductoDetalle() {
           </div>
         </div>
 
-        <div className="product-detail-info">
+        <div className="surface-card product-detail-info">
           <div className="product-title-row">
             <h1>{producto.product_name}</h1>
 
@@ -223,15 +223,15 @@ export default function ProductoDetalle() {
 
               return (
                 <article
-                  className="related-product-card"
+                  className="surface-card interactive-card related-product-card"
                   key={item.product_id}
                 >
                   <button
                     type="button"
                     className={
                       isRelatedFavorite
-                        ? "related-favorite-button active"
-                        : "related-favorite-button"
+                        ? "icon-favorite-button related-favorite-button active"
+                        : "icon-favorite-button related-favorite-button"
                     }
                     onClick={() => toggleFavorite(item)}
                     aria-label={

@@ -3,21 +3,22 @@ import { useState, useEffect } from "react";
 import { upload_image } from "../authentication/db_functions";
 import { delete_image } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
-import { PencilIcon, PlusSquareIcon } from "lucide-react";
+import { useAlerts } from "../context/AlertContext";
+import { PencilIcon, PlusSquareIcon, Search } from "lucide-react";
 
 function Product_card({ product, on_edit }) {
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-DO", {
       style: "currency",
-      currency: "DOP"
-    }).format(value);
+      currency: "DOP",
+    }).format(Number(value || 0));
   };
 
 
   return ( 
 
-    <div className="product-card">
+    <div className="surface-card interactive-card product-card">
       <div className="product-image">
         {product.image_url ? (
           <img src={product.image_url} alt={product.name} loading="lazy"/>
@@ -26,24 +27,31 @@ function Product_card({ product, on_edit }) {
         )}
       </div>
 
-      <p className="product-title"><strong>Nombre: </strong> {product.product_name}</p>
+      <div className="admin-product-content">
+        <div className="admin-product-title">
+          <span>Nombre</span>
+          <h2>{product.product_name}</h2>
+        </div>
 
-      <p className="product-info"> <strong>Descripcion: </strong> {product.description}</p>
-      <p className="product-info"><strong>Suplidor: </strong> {product.supplier_name}</p>
-      <p className="product-info"><strong>Departamento: </strong> {product.depar}</p>
-      <p className="product-info"><strong>Precio Costo: </strong>{formatCurrency(product.cost_price)}</p>
-      <p className="product-info"><strong>Precio Venta: </strong>{formatCurrency(product.sale_price)}</p>
-      <p className="product-info"><strong>Stock: </strong>{product.current_stock}</p>
-      <p className="product-info"><strong>Stock Minimio: </strong>{product.min_stock}</p>
-      <p className="product-info"><strong>Status: </strong>{product.status}</p>
+        <div className="admin-product-fields">
+          <p className="product-info"><strong>Descripcion</strong> <span>{product.description}</span></p>
+          <p className="product-info"><strong>Suplidor</strong> <span>{product.supplier_name}</span></p>
+          <p className="product-info"><strong>Departamento</strong> <span>{product.depar || "Sin departamento"}</span></p>
+          <p className="product-info"><strong>Precio Costo</strong><span>{formatCurrency(product.cost_price)}</span></p>
+          <p className="product-info"><strong>Precio Venta</strong><span>{formatCurrency(product.sale_price)}</span></p>
+          <p className="product-info"><strong>Stock</strong><span>{product.current_stock}</span></p>
+          <p className="product-info"><strong>Stock Minimo</strong><span>{product.min_stock}</span></p>
+          <p className="product-info"><strong>Status</strong><span>{product.status}</span></p>
+        </div>
 
-      <div className="product-actions">
-        <button className="btn" onClick={() => on_edit(product)}>
-          <span>
-            <PencilIcon size={18} />
-            Editar
-          </span>
-        </button>
+        <div className="product-actions">
+          <button className="btn" onClick={() => on_edit(product)}>
+            <span>
+              <PencilIcon size={18} />
+              Editar
+            </span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -51,11 +59,11 @@ function Product_card({ product, on_edit }) {
 }
 
 
-function Product_List ({products, on_edit }) {
-  if (!products.length) return <p>Cargando Productos...</p>;
+function Product_List ({products, on_edit, columnas, emptyText }) {
+  if (!products.length) return <p className="estado">{emptyText}</p>;
 
   return (
-    <div className="client-products-grid">
+    <div className={`responsive-grid admin-products-grid admin-products-grid-${columnas}`}>
       {products.map(product => (
         <Product_card
           key={product.product_id}
@@ -68,6 +76,8 @@ function Product_List ({products, on_edit }) {
 }
 
 function Product_Form({ product, on_save, on_close }) {
+  const { showAlert } = useAlerts();
+
   const [form, set_form] = useState({
     product_name: "",
     description: "",
@@ -144,14 +154,14 @@ function Product_Form({ product, on_save, on_close }) {
   };
 
   const handle_submit = async () => {
-    if (!form.product_name.trim()) return alert("Nombre Es Requerido");
-    if (!form.supplier_id) return alert("Suplidor Es Requerido");
+    if (!form.product_name.trim()) return showAlert("Nombre Es Requerido", "error");
+    if (!form.supplier_id) return showAlert("Suplidor Es Requerido", "error");
 
-    if (Number(form.cost_price) <= 0) return alert("Costo debe ser mayor a 0");
-    if (Number(form.sale_price) <= 0) return alert("Precio de venta debe ser mayor a 0");
-    if (Number(form.current_stock) < 0) return alert("Inventario no puede ser negativo");
-    if (Number(form.min_stock) < 0) return alert("Inventario minimo no puede ser negativo");
-    if (!form.status) return alert("Estado Es Requerido");
+    if (Number(form.cost_price) <= 0) return showAlert("Costo debe ser mayor a 0", "error");
+    if (Number(form.sale_price) <= 0) return showAlert("Precio de venta debe ser mayor a 0", "error");
+    if (Number(form.current_stock) < 0) return showAlert("Inventario no puede ser negativo", "error");
+    if (Number(form.min_stock) < 0) return showAlert("Inventario minimo no puede ser negativo", "error");
+    if (!form.status) return showAlert("Estado Es Requerido", "error");
 
     try {
       set_loading(true);
@@ -159,7 +169,7 @@ function Product_Form({ product, on_save, on_close }) {
       let image_url = form.image_url;
 
       if (image_file) {
-        image_url = await upload_image(image_file);
+        image_url = await upload_image(image_file, 'Products');
 
         if (form.image_url) {
           await delete_image(form.image_url);
@@ -184,7 +194,7 @@ function Product_Form({ product, on_save, on_close }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>{product ? "Edit Product" : "New Product"}</h2>
+        <h2>{product ? "Editar Producto" : "Nuevo Producto"}</h2>
 
         <input name="product_name" placeholder="Nombre" value={form.product_name} onChange={handle_change} />
         <input name="description" placeholder="Descripcion" value={form.description} onChange={handle_change} />
@@ -256,7 +266,10 @@ export default function Products_page() {
   const [products, set_products] = useState([]);
   const [selected_product, set_selected_product] = useState(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const [columnas, set_columnas] = useState(3);
+  const [search_text, set_search_text] = useState("");
   const {user} = useAuth();
+  const { showAlert } = useAlerts();
 
   const load_products = async () => {
     try {
@@ -277,30 +290,40 @@ export default function Products_page() {
     try {
       if (data.product_id) {
         const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url, data.department_id);
-        alert("Product Updated Sucessfully!")
+        showAlert("Product Updated Sucessfully!", "success")
       }
         else {
         const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, 0, data.min_stock, data.status, data.image_url, data.department_id);
         const res2 = await insert_inventory_movement(res.product_id, user.user_id, "ENTRADA", data.current_stock)
-        alert("Product Added Successfully!");
+        showAlert("Product Added Successfully!", "success");
       }
 
       await load_products();
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        alert("Product Already Exists In the Database")
+        showAlert("Product Already Exists In the Database", "error")
       } else {
         console.log(err.message)
       }
     }
   }
 
+  const filtered_products = products.filter((product) =>
+    (product.product_name || "")
+      .toLowerCase()
+      .includes(search_text.trim().toLowerCase())
+  );
+
 
   return (
-    <div className="page-container">
-      <div className="page-header-admin">
-        <h1>Productos</h1>
+    <div className="page-shell page-container">
+      <div className="page-hero page-header-admin">
+        <div>
+          <span>Administración</span>
+          <h1>Productos</h1>
+          <p>Gestiona los productos, precios, inventario y estado del catálogo.</p>
+        </div>
 
         <button
           className="btn-primary"
@@ -316,8 +339,40 @@ export default function Products_page() {
         </button>
       </div>
 
+      <div className="admin-products-toolbar">
+        <label className="admin-products-search">
+          <Search size={18} />
+          <input
+            type="search"
+            placeholder="Buscar producto por nombre"
+            value={search_text}
+            onChange={(event) => set_search_text(event.target.value)}
+          />
+        </label>
+
+        <div className="products-column-control admin-products-column-control" aria-label="Columnas de productos">
+          {[1, 2, 3, 4].map((cantidad) => (
+            <button
+              key={cantidad}
+              type="button"
+              className={columnas === cantidad ? "active" : ""}
+              onClick={() => set_columnas(cantidad)}
+              aria-pressed={columnas === cantidad}
+            >
+              {cantidad}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <Product_List
-        products={products}
+        products={filtered_products}
+        columnas={columnas}
+        emptyText={
+          search_text.trim()
+            ? "No encontramos productos con ese nombre."
+            : "Cargando Productos..."
+        }
         on_edit={(product) => {
           set_selected_product(product);
           set_is_modal_open(true);

@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
 import { get_suppliers, insert_into_suppliers, update_suppliers } from "../authentication/db_functions";
+import { useAlerts } from "../context/AlertContext";
 import {
   PlusSquareIcon, PencilIcon
 } from "lucide-react";
 
 function Supplier_card({ supplier, on_edit }) {
   return (
-    <div className="product-card">
+    <div className="surface-card interactive-card product-card">
 
       <p className="product-title">
-        <strong>Nombre: </strong> {supplier.name}
+        {supplier.name}
       </p>
 
       <p className="product-info">
@@ -40,7 +41,7 @@ function Supplier_List({ suppliers, on_edit }) {
   if (!suppliers.length) return <p>Cargando Suplidores...</p>;
 
   return (
-    <div className="products-grid">
+    <div className="responsive-grid product-grid products-grid">
       {suppliers.map(supplier => (
         <Supplier_card
           key={supplier.supplier_id}
@@ -53,6 +54,8 @@ function Supplier_List({ suppliers, on_edit }) {
 }
 
 function Supplier_Form({ supplier, on_save, on_close }) {
+  const { showAlert } = useAlerts();
+
   const [form, set_form] = useState({
     name: "",
     phone: "",
@@ -77,8 +80,8 @@ function Supplier_Form({ supplier, on_save, on_close }) {
   };
 
   const handle_submit = async () => {
-    if (!form.name.trim()) return alert("Name is required");
-    if (!form.email.trim()) return alert("Email is required");
+    if (!form.name.trim()) return showAlert("Name is required", "error");
+    if (!form.email.trim()) return showAlert("Email is required", "error");
 
     try {
       set_loading(true);
@@ -94,7 +97,7 @@ function Supplier_Form({ supplier, on_save, on_close }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>{supplier ? "Edit Supplier" : "New Supplier"}</h2>
+        <h2>{supplier ? "Editar Suplidor" : "Nuevo Suplidor"}</h2>
 
         <input name="name" placeholder="Name" value={form.name} onChange={handle_change} />
         <input name="phone" placeholder="Phone" value={form.phone} onChange={handle_change} />
@@ -120,6 +123,7 @@ export default function Supplier_page() {
   const [suppliers, set_suppliers] = useState([]);
   const [selected_supplier, set_selected_supplier] = useState(null);
   const [is_modal_open, set_is_modal_open] = useState(false);
+  const { showAlert } = useAlerts();
 
   const load_suppliers = async () => {
     try {
@@ -144,7 +148,7 @@ export default function Supplier_page() {
           data.email,
           data.address
         );
-        alert("Supplier Updated Successfully!");
+        showAlert("Supplier Updated Successfully!", "success");
       } else {
         await insert_into_suppliers(
           data.name,
@@ -152,14 +156,14 @@ export default function Supplier_page() {
           data.email,
           data.address
         );
-        alert("Supplier Added Successfully!");
+        showAlert("Supplier Added Successfully!", "success");
       }
 
       await load_suppliers();
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        alert("Supplier Already Exists In the Database");
+        showAlert("Supplier Already Exists In the Database", "error");
       } else {
         console.log(err.message);
       }
@@ -167,10 +171,14 @@ export default function Supplier_page() {
   };
 
   return (
-    <div className="page-container">
+    <div className="page-shell page-container">
 
-      <div className="page-header-admin">
-        <h1>Suplidores</h1>
+      <div className="page-hero page-header-admin">
+        <div>
+          <span>Administración</span>
+          <h1>Suplidores</h1>
+          <p>Mantén actualizada la información de contacto de los suplidores.</p>
+        </div>
 
         <button
           className="btn-primary"

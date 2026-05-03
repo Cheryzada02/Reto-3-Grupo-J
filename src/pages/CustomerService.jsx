@@ -96,9 +96,9 @@ export default function CustomerService() {
   }
 
   return (
-    <main className="customer-service-page">
-      <section className="customer-service-hero">
-        <span className="customer-service-label">Atención al cliente</span>
+    <main className="page-shell customer-service-page">
+      <section className="page-hero customer-service-hero">
+        <span>Atención al cliente</span>
 
         <h1>¿Necesitas ayuda?</h1>
 
@@ -109,7 +109,7 @@ export default function CustomerService() {
       </section>
 
       <section className="customer-service-layout">
-        <aside className="customer-info-panel">
+        <aside className="surface-card customer-info-panel">
           <h2>Canales de contacto</h2>
 
           <article className="customer-info-item">
@@ -163,7 +163,7 @@ export default function CustomerService() {
           </div>
         </aside>
 
-        <section className="customer-form-panel">
+        <section className="surface-card customer-form-panel">
           <div className="customer-form-header">
             <HelpCircle size={28} />
             <div>
