@@ -187,11 +187,11 @@ function Movement_Form({ movement, on_save, on_close }) {
 
                 <div className="modal-actions">
                     <button onClick={handle_submit} disabled={loading}>
-                        {loading ? "Saving..." : "Save"}
+                        {loading ? "Guardando..." : "Guardar"}
                     </button>
 
                     <button className="btn-secondary" onClick={on_close}>
-                        Cancel
+                        Cancelar
                     </button>
                 </div>
             </div>
@@ -234,7 +234,7 @@ export default function Inventory_movements() {
             data.reference,
             data.notes
         );
-        showAlert("Movement added!", "success");
+        showAlert("Movimiento agregado correctamente.", "success");
 
 
         await load_movements();

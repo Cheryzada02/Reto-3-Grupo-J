@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import {
+  Bell,
   User,
   Heart,
   ShoppingCart,
@@ -8,11 +9,12 @@ import {
   Headphones,
   ChevronDown,
   LogOut,
+  X,
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
-import { get_departments } from "../authentication/db_functions";
+import { get_customer_info, get_departments } from "../authentication/db_functions";
 import ProductSearch from "./ProductSearch";
 
 export default function Navbar() {
@@ -21,6 +23,8 @@ export default function Navbar() {
   const [departamentos, set_departamentos] = useState([]);
 
   const [showDepartments, setShowDepartments] = useState(false);
+  const [isNotificationsOpen, set_is_notifications_open] = useState(false);
+  const [profileImage, setProfileImage] = useState("");
 
   const navigate = useNavigate();
   const { cartCount } = useCart();
@@ -63,6 +67,25 @@ export default function Navbar() {
     load_departments();
   }, []); 
 
+  useEffect(() => {
+    if (!user?.user_id) {
+      setProfileImage("");
+      return;
+    }
+
+    const loadProfileImage = async () => {
+      try {
+        const data = await get_customer_info(user.user_id);
+        const customerData = Array.isArray(data) ? data[0] : data;
+        setProfileImage(customerData?.image_url || "");
+      } catch (error) {
+        console.error("Error cargando foto de perfil:", error);
+      }
+    };
+
+    loadProfileImage();
+  }, [user?.user_id]);
+
   const crearRutaDepartamento = (texto) => {
     return texto
       ?.toLowerCase()
@@ -101,8 +124,28 @@ export default function Navbar() {
         <ProductSearch />
 
         <div className="navbar-actions">
+          <button
+            type="button"
+            className="navbar-action notification-button"
+            onClick={() => set_is_notifications_open(true)}
+            aria-label="Abrir notificaciones"
+          >
+            <Bell size={24} />
+            <span>
+              <strong>Notificaciones</strong>
+            </span>
+          </button>
+
           <Link to={profileLink} className="navbar-action">
-            <User size={28} />
+            {isLoggedIn && profileImage ? (
+              <img
+                src={profileImage}
+                alt="Foto de perfil"
+                className="navbar-profile-avatar"
+              />
+            ) : (
+              <User size={28} />
+            )}
             <span>
               Hola <strong>{userName}</strong>
             </span>
@@ -198,6 +241,45 @@ export default function Navbar() {
         </NavLink>
 
       </nav>
+
+      <div
+        className={
+          isNotificationsOpen
+            ? "notification-overlay open"
+            : "notification-overlay"
+        }
+        onClick={() => set_is_notifications_open(false)}
+        aria-hidden={!isNotificationsOpen}
+      />
+
+      <aside
+        className={
+          isNotificationsOpen
+            ? "notification-panel open"
+            : "notification-panel"
+        }
+        aria-label="Panel de notificaciones"
+        aria-hidden={!isNotificationsOpen}
+      >
+        <div className="notification-panel-header">
+          <div>
+            <span>Panel</span>
+            <h2>Notificaciones</h2>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => set_is_notifications_open(false)}
+            aria-label="Cerrar notificaciones"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="notification-panel-body">
+          <p>Las notificaciones aparecerán aquí.</p>
+        </div>
+      </aside>
     </header>
   );
 }

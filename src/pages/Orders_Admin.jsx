@@ -55,7 +55,7 @@ function Order_Row({
             value={edit_values.order_status || ""}
             onChange={on_change}
           >
-            <option value="">-- Select --</option>
+            <option value="">-- Seleccionar --</option>
             <option value="Pendiente">Pendiente</option>
             <option value="Procesando">Procesando</option>
             <option value="Completada">Completada</option>
@@ -71,7 +71,7 @@ function Order_Row({
             value={edit_values.payment_status || ""}
             onChange={on_change}
           >
-            <option value="">-- Select --</option>
+            <option value="">-- Seleccionar --</option>
             <option value="Pendiente">Pendiente</option>
             <option value="Pagado">Pagado</option>
             <option value="Devolución">Devolución</option>
@@ -88,8 +88,8 @@ function Order_Row({
       <td className="table-actions">
         {is_editing ? (
           <>
-            <button className="table-action-button" onClick={on_save}>Save</button>
-            <button className="table-action-button" onClick={on_cancel}>Cancel</button>
+            <button className="table-action-button" onClick={on_save}>Guardar</button>
+            <button className="table-action-button" onClick={on_cancel}>Cancelar</button>
           </>
         ) : (
           <>
@@ -152,7 +152,7 @@ function Order_Table({
             <th>Estado Orden</th>
             <th>Estado Pago</th>
             <th>Subtotal</th>
-            <th>Tax</th>
+            <th>Impuesto</th>
             <th>Descuento</th>
             <th>Total</th>
             <th>Creada En</th>

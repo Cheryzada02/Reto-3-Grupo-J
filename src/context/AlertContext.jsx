@@ -54,7 +54,7 @@ export function useAlerts() {
   const context = useContext(AlertContext);
 
   if (!context) {
-    throw new Error("useAlerts must be used inside AlertProvider");
+    throw new Error("useAlerts debe usarse dentro de AlertProvider");
   }
 
   return context;

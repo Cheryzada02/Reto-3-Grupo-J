@@ -41,7 +41,7 @@ function Product_card({ product, on_edit }) {
           <p className="product-info"><strong>Precio Venta</strong><span>{formatCurrency(product.sale_price)}</span></p>
           <p className="product-info"><strong>Stock</strong><span>{product.current_stock}</span></p>
           <p className="product-info"><strong>Stock Minimo</strong><span>{product.min_stock}</span></p>
-          <p className="product-info"><strong>Status</strong><span>{product.status}</span></p>
+          <p className="product-info"><strong>Estado</strong><span>{product.status}</span></p>
         </div>
 
         <div className="product-actions">
@@ -250,11 +250,11 @@ function Product_Form({ product, on_save, on_close }) {
 
         <div className="modal-actions">
           <button onClick={handle_submit} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Guardando..." : "Guardar"}
           </button>
 
           <button className="btn-secondary" onClick={on_close}>
-            Cancel
+            Cancelar
           </button>
         </div>
       </div>
@@ -290,19 +290,19 @@ export default function Products_page() {
     try {
       if (data.product_id) {
         const res = await update_products(data.product_id, data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, data.current_stock, data.min_stock, data.status, data.image_url, data.department_id);
-        showAlert("Product Updated Sucessfully!", "success")
+        showAlert("Producto actualizado correctamente.", "success")
       }
         else {
         const res = await insert_into_products(data.product_name, data.description, data.supplier_id, data.cost_price, data.sale_price, 0, data.min_stock, data.status, data.image_url, data.department_id);
         const res2 = await insert_inventory_movement(res.product_id, user.user_id, "ENTRADA", data.current_stock)
-        showAlert("Product Added Successfully!", "success");
+        showAlert("Producto agregado correctamente.", "success");
       }
 
       await load_products();
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        showAlert("Product Already Exists In the Database", "error")
+        showAlert("El producto ya existe en la base de datos.", "error")
       } else {
         console.log(err.message)
       }

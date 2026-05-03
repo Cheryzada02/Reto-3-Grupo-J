@@ -160,29 +160,37 @@ export default function Cart() {
 
         try {
           const response_order = await insert_orders(customer.customer_id, user.user_id, "Online", subtotal, tax, 0, total)
+
           for (const item of cartItems) { 
             try {
               const res = await insert_orders_items(response_order, item.product_id, item.quantity, item.sale_price, 0, item.quantity * item.sale_price, user.user_id)
             } catch (error) {
-              console.log(error)
+              errors = true
+              console.log(error.message)
+              set_loading(false);
             }
           }
         } catch (error) {
-          console.log(error)  
+          errors = true
+          console.log(error.message)
+          set_loading(false);
         }
       } catch (error) {
-        console.log(error)
+        errors = true
+        console.log(error.message)
+        set_loading(false);
       }
+      
+      if (!errors) {
+        showAlert("Orden confirmada correctamente. Se generó una factura provisional en PDF.", "success");
 
-      showAlert("Orden confirmada correctamente. Se generó una factura provisional en PDF.", "success");
-
-      generarFacturaProvisionalPDF();
-  
-      clearCart();
-      setShowCheckoutDetail(true);
-      set_loading(false);
+        generarFacturaProvisionalPDF();
+    
+        clearCart();
+        setShowCheckoutDetail(true);
+        set_loading(false);
+      }
     }
-
   };
 
   return (

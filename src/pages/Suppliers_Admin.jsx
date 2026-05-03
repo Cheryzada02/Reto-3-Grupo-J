@@ -80,8 +80,8 @@ function Supplier_Form({ supplier, on_save, on_close }) {
   };
 
   const handle_submit = async () => {
-    if (!form.name.trim()) return showAlert("Name is required", "error");
-    if (!form.email.trim()) return showAlert("Email is required", "error");
+    if (!form.name.trim()) return showAlert("El nombre es requerido.", "error");
+    if (!form.email.trim()) return showAlert("El correo es requerido.", "error");
 
     try {
       set_loading(true);
@@ -106,11 +106,11 @@ function Supplier_Form({ supplier, on_save, on_close }) {
 
         <div className="modal-actions">
           <button onClick={handle_submit} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Guardando..." : "Guardar"}
           </button>
 
           <button className="btn-secondary" onClick={on_close}>
-            Cancel
+            Cancelar
           </button>
         </div>
       </div>
@@ -148,7 +148,7 @@ export default function Supplier_page() {
           data.email,
           data.address
         );
-        showAlert("Supplier Updated Successfully!", "success");
+        showAlert("Suplidor actualizado correctamente.", "success");
       } else {
         await insert_into_suppliers(
           data.name,
@@ -156,14 +156,14 @@ export default function Supplier_page() {
           data.email,
           data.address
         );
-        showAlert("Supplier Added Successfully!", "success");
+        showAlert("Suplidor agregado correctamente.", "success");
       }
 
       await load_suppliers();
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        showAlert("Supplier Already Exists In the Database", "error");
+        showAlert("El suplidor ya existe en la base de datos.", "error");
       } else {
         console.log(err.message);
       }

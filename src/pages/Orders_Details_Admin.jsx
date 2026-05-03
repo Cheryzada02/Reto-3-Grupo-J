@@ -169,7 +169,7 @@ export default function Orders_detail_Page() {
           <Search size={18} />
           <input
             type="search"
-            placeholder="Buscar por Order status"
+            placeholder="Buscar por estado de orden"
             value={statusSearch}
             onChange={handleStatusSearch}
           />
@@ -180,7 +180,7 @@ export default function Orders_detail_Page() {
           className="btn admin-table-clear"
           onClick={handleViewAll}
         >
-          Ver Todos
+          Ver todos
         </button>
       </div>
 

@@ -5,6 +5,20 @@ import {
 } from "lucide-react";
 
 function Customer_card({ customer, on_edit }) {
+
+  const date_time_display = (value) => {
+    const original = new Date(value);
+    return new Intl.DateTimeFormat('es-DO', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).format(original);
+  };
+
   return (
     <div className="surface-card interactive-card product-card">
 
@@ -45,7 +59,7 @@ function Customer_card({ customer, on_edit }) {
       </p>
 
       <p className="product-info">
-        <strong>Ultima Sesion: </strong> {customer.last_login}
+        <strong>Ultima Sesion: </strong> {date_time_display(customer.last_login)}
       </p>
     </div>
   );

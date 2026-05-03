@@ -44,7 +44,7 @@ function Department_card({ department, on_edit }) {
 
 
 function Department_List ({departments, on_edit }) {
-  if (!departments.length) return <p>Cargando Departmentos...</p>;
+  if (!departments.length) return <p>Cargando departamentos...</p>;
 
   return (
     <div className="responsive-grid client-products-grid">
@@ -138,7 +138,7 @@ function Department_Form({ department, on_save, on_close }) {
   return (
     <div className="modal-overlay">
       <div className="modal">
-        <h2>{department ? "Editar Departmento" : "Nuevo Departmento"}</h2>
+        <h2>{department ? "Editar Departamento" : "Nuevo Departamento"}</h2>
 
         <input name="department_name" placeholder="Nombre" value={form.department_name} onChange={handle_change} />
 
@@ -149,11 +149,11 @@ function Department_Form({ department, on_save, on_close }) {
 
         <div className="modal-actions">
           <button onClick={handle_submit} disabled={loading}>
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Guardando..." : "Guardar"}
           </button>
 
           <button className="btn-secondary" onClick={on_close}>
-            Cancel
+            Cancelar
           </button>
         </div>
       </div>
@@ -187,18 +187,18 @@ export default function Departments_page() {
     try {
       if (data.department_id) {
         const res = await update_departments(data.department_id, data.department_name, data.department_url);
-        showAlert("Department Updated Sucessfully!", "success")
+        showAlert("Departamento actualizado correctamente.", "success")
       }
         else {
         const res = await insert_into_departments(data.department_name, data.department_url);
-        showAlert("Department Added Successfully!", "success");
+        showAlert("Departamento agregado correctamente.", "success");
       }
 
       await load_departments();
 
     } catch (err) {
       if (err.message.includes("duplicate key value")) {
-        showAlert("Department Already Exists In the Database", "error")
+        showAlert("El departamento ya existe en la base de datos.", "error")
       } else {
         console.log(err.message)
       }
@@ -211,7 +211,7 @@ export default function Departments_page() {
       <div className="page-hero page-header-admin">
         <div>
           <span>Administración</span>
-          <h1>Departmentos</h1>
+          <h1>Departamentos</h1>
           <p>Organiza las áreas del catálogo y sus imágenes visibles para clientes.</p>
         </div>
 
@@ -224,7 +224,7 @@ export default function Departments_page() {
         >
           <span>
             <PlusSquareIcon size={18} />
-            Agregar Departmento
+            Agregar Departamento
           </span>
         </button>
       </div>

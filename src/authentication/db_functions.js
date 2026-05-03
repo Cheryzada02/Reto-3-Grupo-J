@@ -315,3 +315,40 @@ export async function update_orders(id, order_status, payment_status) {
 
     return data
 }
+
+//Update Customers
+export async function update_customer_profile(id, fullname, phone, email, address, image_url) {
+    const {data, error} = await supabase.rpc("update_customers", {
+    p_customer_id: id,
+    p_full_name: fullname,
+    p_phone: phone,
+    p_email: email,
+    p_address: address,
+    p_image_url: image_url
+    })
+    if (error) throw error
+
+    return data
+}
+
+
+// Get_ Customer_order_by_id
+export async function get_customer_order_by_customer_id(customer_id) {
+    const {data, error} = await supabase.rpc("get_customer_orders", {
+    p_customer_id: customer_id
+    })
+    if (error) throw error
+
+    return data
+}
+
+
+// Get_Customer_order_details_by_order_id
+export async function get_customer_order_details_by_order_id(order_id) {
+    const {data, error} = await supabase.rpc("get_customer_orders_details", {
+    p_order_id: order_id
+    })
+    if (error) throw error
+
+    return data
+}
