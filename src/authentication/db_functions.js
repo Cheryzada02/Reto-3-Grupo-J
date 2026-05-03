@@ -352,3 +352,11 @@ export async function get_customer_order_details_by_order_id(order_id) {
 
     return data
 }
+
+// View Stock Alers
+export async function get_stock_alerts () {
+    const {data, error} = await supabase.from('view_stock_alerts').select('*')
+    if (error) throw error
+
+    return data
+}
