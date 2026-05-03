@@ -11,6 +11,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useCart } from "../context/CartContext";
+import { get_products } from "../authentication/db_functions";
 
 const slides = [
   {
@@ -58,7 +60,17 @@ const categories = [
 ];
 
 export default function Home() {
+  const { addToCart } = useCart();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("es-DO", {
+      style: "currency",
+      currency: "DOP",
+    }).format(Number(value || 0));
+  };
 
   const nextSlide = () => {
     setCurrentSlide((prev) =>
@@ -79,6 +91,29 @@ export default function Home() {
   useEffect(() => {
     const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const loadRecommendedProducts = async () => {
+      try {
+        const data = await get_products();
+        const products = data
+          .filter((product) => product.status === "Activo")
+          .sort(
+            (a, b) =>
+              Number(b.current_stock || 0) - Number(a.current_stock || 0)
+          )
+          .slice(0, 10);
+
+        setRecommendedProducts(products);
+      } catch (error) {
+        console.error("Error cargando productos recomendados:", error);
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
+
+    loadRecommendedProducts();
   }, []);
 
   const slide = slides[currentSlide];
@@ -184,6 +219,73 @@ export default function Home() {
             </article>
           );
         })}
+      </section>
+
+      <section className="home-recommended-section">
+        <div className="home-recommended-header">
+          <h2>Recomendados</h2>
+        </div>
+
+        {loadingRecommended ? (
+          <p className="estado">Cargando productos recomendados...</p>
+        ) : !recommendedProducts.length ? (
+          <p className="estado">No hay productos recomendados disponibles.</p>
+        ) : (
+          <>
+            <div className="home-recommended-grid">
+              {recommendedProducts.map((product) => {
+                const hasStock = Number(product.current_stock || 0) > 0;
+
+                return (
+                  <article
+                    className="home-recommended-card"
+                    key={product.product_id}
+                  >
+                    {!hasStock && (
+                      <span className="home-stock-badge">Agotado</span>
+                    )}
+
+                    <Link
+                      to={`/productos/${product.product_id}`}
+                      className="home-recommended-image"
+                    >
+                      <img
+                        src={product.image_url || "/placeholder-product.png"}
+                        alt={product.product_name}
+                        loading="lazy"
+                      />
+                    </Link>
+
+                    <div className="home-recommended-body">
+                      <span>
+                        {product.supplier_name || "Ferretería Elupina"}
+                      </span>
+
+                      <Link to={`/productos/${product.product_id}`}>
+                        <h3>{product.product_name}</h3>
+                      </Link>
+
+                      <p>{formatCurrency(product.sale_price)}</p>
+
+                      <button
+                        type="button"
+                        className="home-recommended-button"
+                        onClick={() => addToCart(product)}
+                        disabled={!hasStock}
+                      >
+                        {hasStock ? "Añadir al carrito" : "Agotado"}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
+            <Link to="/productos" className="home-recommended-more">
+              Ver más
+            </Link>
+          </>
+        )}
       </section>
 
       <section className="home-cta">
