@@ -32,7 +32,7 @@ export default function Navbar_Admin() {
   };
 
   return (
-    <header className="navbar">
+    <header className="navbar navbar-admin">
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
@@ -53,7 +53,8 @@ export default function Navbar_Admin() {
 
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
-          Ferretería Elupina Admin
+          <img src="/logo-elupina.svg" alt="Ferreteria Elupina Admin" />
+          <span>Admin</span>
         </Link>
 
         <ProductSearch />
@@ -151,6 +152,13 @@ export default function Navbar_Admin() {
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           Detalle Ordenes
+        </NavLink>
+
+        <NavLink
+          to="/sobre-nosotros"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Sobre nosotros
         </NavLink>
 
       </nav>

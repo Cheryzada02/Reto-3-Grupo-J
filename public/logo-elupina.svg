@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 72" role="img" aria-labelledby="title desc">
+  <title id="title">Ferreteria Elupina</title>
+  <desc id="desc">Logo de Ferreteria Elupina con techo, herramienta y letra E.</desc>
+  <defs>
+    <linearGradient id="roof" x1="28" y1="8" x2="72" y2="54" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f2a36b"/>
+      <stop offset="1" stop-color="#b84a3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="240" height="72" rx="16" fill="#183b59"/>
+  <g transform="translate(14 10)">
+    <path d="M6 28 32 6l26 22v24a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V28Z" fill="#fff"/>
+    <path d="M2 30 32 4l30 26" fill="none" stroke="url(#roof)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M22 52V30h24v7H31v4h13v7H31v4h15v7H22Z" fill="#183b59"/>
+    <path d="M48 14 58 4l6 6-10 10 5 5-6 6-5-5-18 18-6-6 18-18-5-5 6-6 5 5Z" fill="#f2a36b"/>
+  </g>
+  <g fill="#fff">
+    <text x="88" y="31" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="800">Ferreteria</text>
+    <text x="88" y="53" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="800" fill="#ffe2c9">Elupina</text>
+  </g>
+</svg>
