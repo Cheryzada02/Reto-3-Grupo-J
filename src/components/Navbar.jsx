@@ -118,7 +118,7 @@ export default function Navbar() {
 
       <div className="navbar-main">
         <Link to="/" className="navbar-logo">
-          Ferreteria Elupina
+          <img src="/logo-elupina.svg" alt="Ferreteria Elupina" />
         </Link>
 
         <ProductSearch />
@@ -238,6 +238,13 @@ export default function Navbar() {
           className={({ isActive }) => (isActive ? "active" : "")}
         >
           Soporte
+        </NavLink>
+
+        <NavLink
+          to="/sobre-nosotros"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Sobre nosotros
         </NavLink>
 
       </nav>
