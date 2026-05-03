@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { sendCustomerRequest } from "../api/customerServiceApi";
+import { send_email } from "../authentication/db_functions";
 
 export default function CustomerService() {
   const [formData, setFormData] = useState({
@@ -41,10 +42,7 @@ export default function CustomerService() {
     if (!formData.email.includes("@")) return "Correo inválido.";
     if (!formData.subject.trim()) return "El asunto es obligatorio.";
     if (!formData.message.trim()) return "El mensaje es obligatorio.";
-    if (formData.message.trim().length < 10) {
-      return "El mensaje debe tener al menos 10 caracteres.";
-    }
-
+    
     return null;
   }
 
@@ -69,7 +67,7 @@ export default function CustomerService() {
         message: "Enviando solicitud...",
       });
 
-      await sendCustomerRequest(formData);
+      await send_email();
 
       setStatus({
         type: "success",

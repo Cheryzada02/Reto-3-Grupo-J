@@ -360,3 +360,37 @@ export async function get_stock_alerts () {
 
     return data
 }
+
+export async function send_email() {
+  try {
+    const { data, error } = await supabase.functions.invoke("Send-Google-Email", {
+      body: {
+        to: "raykelvillar@gmail.com",
+        subject: "Confirmación de orden",
+        message: `
+          <h2>Gracias por su compra</h2>
+          <p>Su orden fue recibida correctamente.</p>
+        `,
+        html: true,
+      },
+    });
+
+    if (error) {
+      console.error("Function error object:", error);
+
+      if (error.context) {
+        const error_body = await error.context.json().catch(() => null);
+        console.error("Edge Function response:", error_body);
+      }
+
+      throw error;
+    }
+
+    console.log("Email sent successfully:", data);
+
+    return data;
+  } catch (error) {
+    console.error("send_email error:", error);
+    throw error;
+  }
+}
