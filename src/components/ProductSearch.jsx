@@ -90,7 +90,7 @@ export default function ProductSearch({ className = "navbar-search" }) {
 
                   <span>
                     <strong>{product.product_name}</strong>
-                    <small>{product.supplier_name || "Producto disponible"}</small>
+                    <small>{product.department_name || "Producto disponible"}</small>
                   </span>
                 </button>
               ))
