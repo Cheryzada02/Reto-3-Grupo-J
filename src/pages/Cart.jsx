@@ -57,7 +57,12 @@ export default function Cart() {
     }).format(Number(value || 0));
   };
 
-  const generarFacturaProvisionalPDF = () => {
+  const generarFacturaProvisionalPDF = (
+    invoiceItems = cartItems,
+    invoiceSubtotal = subtotal,
+    invoiceTax = tax,
+    invoiceTotal = total
+  ) => {
     const doc = new jsPDF();
 
     const numeroFactura = `FE-${Date.now()}`;
@@ -84,7 +89,7 @@ export default function Cart() {
     autoTable(doc, {
       startY: 82,
       head: [["Producto", "Cantidad", "Precio", "Subtotal"]],
-      body: cartItems.map((item) => [
+      body: invoiceItems.map((item) => [
         item.product_name,
         item.quantity,
         formatCurrency(item.sale_price),
@@ -101,9 +106,9 @@ export default function Cart() {
     const finalY = doc.lastAutoTable.finalY + 12;
 
     doc.setFontSize(11);
-    doc.text(`Subtotal: ${formatCurrency(subtotal)}`, 14, finalY);
-    doc.text(`ITBIS 18%: ${formatCurrency(tax)}`, 14, finalY + 8);
-    doc.text(`Total: ${formatCurrency(total)}`, 14, finalY + 16);
+    doc.text(`Subtotal: ${formatCurrency(invoiceSubtotal)}`, 14, finalY);
+    doc.text(`ITBIS 18%: ${formatCurrency(invoiceTax)}`, 14, finalY + 8);
+    doc.text(`Total: ${formatCurrency(invoiceTotal)}`, 14, finalY + 16);
 
     doc.setFontSize(9);
     doc.text(
@@ -198,9 +203,15 @@ export default function Cart() {
       }
       
       if (!errors) {
-        showAlert("Orden confirmada correctamente. Se generó una factura provisional en PDF.", "success");
+        showAlert("Orden confirmada correctamente.", "success");
 
-        generarFacturaProvisionalPDF();
+        const shouldDownloadInvoice = window.confirm(
+          "Orden confirmada correctamente. ¿Deseas descargar la factura provisional en PDF?"
+        );
+
+        if (shouldDownloadInvoice) {
+          generarFacturaProvisionalPDF(cartItems, subtotal, tax, total);
+        }
     
         clearCart();
         setShowCheckoutDetail(false);
@@ -397,7 +408,7 @@ export default function Cart() {
             </div>
 
             <div className="checkout-detail-total">
-              <span>Total a pagar</span>
+              <span>Total a pagar: </span>
               <strong>{formatCurrency(total)}</strong>
             </div>
 
@@ -412,7 +423,7 @@ export default function Cart() {
               onClick={confirmOrder}
               disabled={loading}
             >
-              {loading ? "Confirmando..." : " Hacer pedido y generar factura"}
+              {loading ? "Confirmando..." : " Hacer pedido"}
             </button>
           </div>
         </section>
