@@ -420,7 +420,7 @@ export default function Chatbot() {
               </span>
               <div>
                 <h2>Elupin</h2>
-                <p>Tu amigo de confianza</p>
+                <p>Tu amigo de confianza - Version BETA</p>
               </div>
             </div>
 
