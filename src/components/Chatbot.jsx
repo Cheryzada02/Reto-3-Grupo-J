@@ -104,10 +104,21 @@ const isSpecificProductSearch = (text) => getWords(text).length > 0;
 export default function Chatbot() {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [hasUnreadGuestMessage, setHasUnreadGuestMessage] = useState(false);
   const [messages, setMessages] = useState(initialMessages);
   const [messageText, setMessageText] = useState("");
   const [products, setProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
+
+  useEffect(() => {
+    setHasUnreadGuestMessage(!user);
+  }, [user]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setHasUnreadGuestMessage(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -386,6 +397,18 @@ export default function Chatbot() {
     setMessageText("");
   };
 
+  const toggleChat = () => {
+    setIsOpen((current) => {
+      if (!current) {
+        setHasUnreadGuestMessage(false);
+      }
+
+      return !current;
+    });
+  };
+
+  const showUnreadBadge = !user && !isOpen && hasUnreadGuestMessage;
+
   return (
     <div className="chatbot-widget">
       {isOpen && (
@@ -496,10 +519,21 @@ export default function Chatbot() {
       <button
         type="button"
         className="chatbot-toggle"
-        onClick={() => setIsOpen((current) => !current)}
-        aria-label={isOpen ? "Cerrar chat" : "Abrir chat"}
+        onClick={toggleChat}
+        aria-label={
+          showUnreadBadge
+            ? "Abrir chat, tienes 1 mensaje sin leer"
+            : isOpen
+              ? "Cerrar chat"
+              : "Abrir chat"
+        }
       >
         {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+        {showUnreadBadge && (
+          <span className="chatbot-unread-badge" aria-hidden="true">
+            1
+          </span>
+        )}
       </button>
     </div>
   );
