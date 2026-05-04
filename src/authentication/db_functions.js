@@ -1,5 +1,6 @@
 
 import { supabase } from './supabaseclient'
+import { optimize_image } from '../utils/imageOptimization'
 
 // Function to Register User
 export async function insert_into_user_profile (full_name, internal_email, password_hash) {
@@ -108,11 +109,30 @@ export async function update_products(id, name, description, supplier_id, cost_p
 // Upload Image
 export async function upload_image(file, bucked_name) {
 
-    const fileName = `${bucked_name}/${Date.now()}-${file.name}`;
+    const uploadType = String(bucked_name || "").toLowerCase();
+    const optimizationOptions = uploadType === "customers"
+        ? {
+            max_width: 720,
+            max_height: 720,
+            initial_quality: 0.82,
+            min_quality: 0.35,
+        }
+        : {
+            max_width: 1200,
+            max_height: 1200,
+            initial_quality: 0.85,
+            min_quality: 0.4,
+        };
+    const optimizedImage = await optimize_image(file, optimizationOptions);
+    const uploadFile = optimizedImage.file;
+
+    const fileName = `${bucked_name}/${Date.now()}-${uploadFile.name}`;
 
     const { data, error } = await supabase.storage
         .from("ferreteriard-images")
-        .upload(fileName, file);
+        .upload(fileName, uploadFile, {
+            contentType: uploadFile.type,
+        });
 
     if (error) {
         console.error(error);
