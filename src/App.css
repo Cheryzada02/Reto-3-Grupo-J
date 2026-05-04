@@ -4638,6 +4638,7 @@ h1 {
 }
 
 .chatbot-toggle {
+  position: relative;
   width: 58px;
   height: 58px;
   padding: 0;
@@ -4649,6 +4650,25 @@ h1 {
   color: white;
   border: 1px solid var(--color-border);
   box-shadow: none;
+}
+
+.chatbot-unread-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-accent);
+  color: white;
+  border: 2px solid white;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .chatbot-toggle:hover {
