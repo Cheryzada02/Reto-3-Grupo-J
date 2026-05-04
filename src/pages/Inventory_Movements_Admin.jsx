@@ -14,7 +14,7 @@ import { formatDateTime } from "../utils/dateFormat";
 import TableExportActions from "../components/TableExportActions";
 
 const inventoryExportColumns = [
-  { label: "Fecha", value: (row) => formatDateTime(row.movement_date) },
+  { label: "Fecha", value: (row) => formatDateTime(row.updated_at) },
   { label: "Producto", value: "product_name" },
   { label: "Tipo", value: "movement_type" },
   { label: "Cantidad", value: "quantity" },
@@ -39,7 +39,7 @@ function Movement_Row({ movement }) {
 
   return (
     <tr>
-      <td>{formatDateTime(movement.movement_date)}</td>
+      <td>{formatDateTime(movement.updated_at)}</td>
       <td>{movement.product_name}</td>
       <td>
         <span className={get_type_class(movement.movement_type)}>

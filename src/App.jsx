@@ -26,6 +26,7 @@ import DepartamentosAdmin from "./pages/Departamentos_Admin";
 import SobreNosotrosAdmin from "./pages/SobreNosotros_Admin";
 import StockAlertsPage from "./pages/Stock_Alerts";
 import PerfilAdmin from "./pages/Perfil_Admin";
+import DashboardAdmin from "./pages/Dashboard_Admin";
 
 import { useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
@@ -45,7 +46,8 @@ function App() {
               <Navbar_Admin />
 
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<DashboardAdmin />} />
+                <Route path="/dashboard" element={<DashboardAdmin />} />
                 <Route path="/productos" element={<ProductsPage />} />
                 <Route path="/productos/:id" element={<ProductoDetalle />} />
                 <Route path="/departamentos" element={<DepartamentosAdmin />} />

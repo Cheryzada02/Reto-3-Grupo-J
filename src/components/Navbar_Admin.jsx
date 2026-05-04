@@ -162,7 +162,7 @@ export default function Navbar_Admin() {
       </div>
 
       <div className="navbar-main">
-        <Link to="/" className="navbar-logo">
+        <Link to="/dashboard" className="navbar-logo">
           <img src="/logo-elupina.svg" alt="Ferreteria Elupina Admin" />
           <span>Admin</span>
         </Link>
@@ -213,7 +213,7 @@ export default function Navbar_Admin() {
 
       <nav className="navbar-menu">
         <NavLink
-          to="/"
+          to="/dashboard"
           end
           className={({ isActive }) => (isActive ? "active" : "")}
         >

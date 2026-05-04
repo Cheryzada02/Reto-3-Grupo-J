@@ -59,7 +59,7 @@ function Order_Row({
             onChange={on_change}
           >
             <option value="">-- Seleccionar --</option>
-            <option value="Pendiente">Pendiente</option>
+            <option value="Pendiente Pick Up">Pendiente Pick Up</option>
             <option value="Procesando">Procesando</option>
             <option value="Completada">Completada</option>
             <option value="Cancelada">Cancelada</option>
