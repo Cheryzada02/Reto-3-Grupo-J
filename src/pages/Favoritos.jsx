@@ -14,6 +14,18 @@ export default function Favoritos() {
     }).format(value);
   };
 
+  const getStockInfo = (product) => {
+    const stock = Number(product.current_stock ?? product.stock ?? 0);
+    const minStock = Number(product.min_stock ?? 0);
+
+    return {
+      stock,
+      hasStock: stock > 0,
+      isLowStock: stock > 0 && minStock > 0 && stock <= minStock,
+      label: stock === 1 ? "Queda 1 unidad" : `Quedan ${stock} unidades`,
+    };
+  };
+
   return (
     <main className="page-shell favorites-page">
       <section className="favorites-header">
@@ -30,54 +42,67 @@ export default function Favoritos() {
         </section>
       ) : (
         <section className="responsive-grid favorites-grid">
-          {favorites.map((product) => (
-            <article
-              className="surface-card interactive-card client-product-card favorite-card"
-              key={product.product_id}
-            >
-              <Link
-                to={`/productos/${product.product_id}`}
-                className="client-product-image favorite-image"
+          {favorites.map((product) => {
+            const stockInfo = getStockInfo(product);
+
+            return (
+              <article
+                className="surface-card interactive-card client-product-card favorite-card"
+                key={product.product_id}
               >
-                <img
-                  src={product.image_url || "/placeholder-product.png"}
-                  alt={product.product_name}
-                  loading="lazy"
-                />
-              </Link>
+                {!stockInfo.hasStock ? (
+                  <span className="client-stock-badge sold-out">Agotado</span>
+                ) : stockInfo.isLowStock ? (
+                  <span className="client-stock-badge low-stock">
+                    Pocas unidades
+                  </span>
+                ) : null}
 
-              <div className="client-product-body favorite-info">
-                <Link to={`/productos/${product.product_id}`}>
-                  <h3>{product.product_name}</h3>
+                <Link
+                  to={`/productos/${product.product_id}`}
+                  className="client-product-image favorite-image"
+                >
+                  <img
+                    src={product.image_url || "/placeholder-product.png"}
+                    alt={product.product_name}
+                    loading="lazy"
+                  />
                 </Link>
-                <p>{product.description}</p>
 
-                <div className="client-product-price favorite-price">
-                  {formatCurrency(product.sale_price)}
+                <div className="client-product-body favorite-info">
+                  <Link to={`/productos/${product.product_id}`}>
+                    <h3>{product.product_name}</h3>
+                  </Link>
+                  <p>{product.description}</p>
+
+                  <div className="client-product-price favorite-price">
+                    {formatCurrency(product.sale_price)}
+                  </div>
+
+                  <div className="favorite-actions">
+                    <button
+                      type="button"
+                      className="client-product-button"
+                      onClick={() => addToCart(product)}
+                      disabled={!stockInfo.hasStock}
+                    >
+                      <ShoppingCart size={17} />
+                      {stockInfo.hasStock ? "Agregar al carrito" : "Agotado"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="favorite-remove"
+                      onClick={() => removeFavorite(product.product_id)}
+                    >
+                      <Trash2 size={17} />
+                      Quitar
+                    </button>
+                  </div>
                 </div>
-
-                <div className="favorite-actions">
-                  <button
-                    type="button"
-                    className="client-product-button"
-                    onClick={() => addToCart(product)}
-                  >
-                    <ShoppingCart size={17} />
-                    Agregar al carrito
-                  </button>
-
-                  <button
-                    type="button"
-                    className="favorite-remove"
-                    onClick={() => removeFavorite(product.product_id)}
-                  >
-                    <Trash2 size={17} />
-                    Quitar
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </section>
       )}
     </main>

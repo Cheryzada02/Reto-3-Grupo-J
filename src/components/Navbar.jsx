@@ -98,10 +98,10 @@ export default function Navbar() {
             +1(809)-536-9114
           </span>
 
-          <span>
+          <Link to="/servicio-cliente">
             <Mail size={16} />
-            soporteweb@ferreteriaelupina.com.do
-          </span>
+            ferreteriaelupina@gmail.com
+          </Link>
         </div>
 
         <Link to="/faq" className="navbar-faq">

@@ -17,7 +17,7 @@ import { get_products } from "../authentication/db_functions";
 const slides = [
   {
     image:
-      "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=1400&q=80",
     title: "Herramientas para cada proyecto",
     text: "Encuentra productos confiables para construcción, reparación y mantenimiento.",
     button: "Ver productos",
@@ -25,7 +25,7 @@ const slides = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&w=1400&q=80",
     title: "Materiales de construcción",
     text: "Todo lo que necesitas para trabajar con seguridad y calidad.",
     button: "Explorar tienda",
@@ -33,11 +33,51 @@ const slides = [
   },
   {
     image:
-      "https://images.unsplash.com/photo-1562259949-e8e7689d7828?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1400&q=80",
     title: "Retiro en tienda",
     text: "Compra tus productos y retíralos directamente en nuestra ferretería.",
     button: "Ver preguntas frecuentes",
     link: "/faq",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1400&q=80",
+    title: "Herramientas electricas",
+    text: "Equipa tu taller con productos practicos para cortar, perforar y reparar.",
+    button: "Comprar ahora",
+    link: "/productos",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1604014237800-1c9102c219da?auto=format&fit=crop&w=1400&q=80",
+    title: "Soluciones para el hogar",
+    text: "Encuentra accesorios y materiales para arreglos rapidos y mejoras diarias.",
+    button: "Explorar productos",
+    link: "/productos",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?auto=format&fit=crop&w=1400&q=80",
+    title: "Pinturas y terminaciones",
+    text: "Dale nueva vida a tus espacios con pinturas, brochas y accesorios.",
+    button: "Ver catalogo",
+    link: "/productos",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80",
+    title: "Construccion y mantenimiento",
+    text: "Materiales confiables para proyectos de obra, reparacion y remodelacion.",
+    button: "Ver productos",
+    link: "/productos",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=80",
+    title: "Asesoria para tu proyecto",
+    text: "Te orientamos para elegir herramientas y materiales segun lo que necesitas.",
+    button: "Contactar soporte",
+    link: "/servicio-cliente",
   },
 ];
 
@@ -70,6 +110,18 @@ export default function Home() {
       style: "currency",
       currency: "DOP",
     }).format(Number(value || 0));
+  };
+
+  const getStockInfo = (product) => {
+    const stock = Number(product.current_stock ?? product.stock ?? 0);
+    const minStock = Number(product.min_stock ?? 0);
+
+    return {
+      stock,
+      hasStock: stock > 0,
+      isLowStock: stock > 0 && minStock > 0 && stock <= minStock,
+      label: stock === 1 ? "Queda 1 unidad" : `Quedan ${stock} unidades`,
+    };
   };
 
   const nextSlide = () => {
@@ -234,16 +286,20 @@ export default function Home() {
           <>
             <div className="home-recommended-grid">
               {recommendedProducts.map((product) => {
-                const hasStock = Number(product.current_stock || 0) > 0;
+                const stockInfo = getStockInfo(product);
 
                 return (
                   <article
                     className="home-recommended-card"
                     key={product.product_id}
                   >
-                    {!hasStock && (
-                      <span className="home-stock-badge">Agotado</span>
-                    )}
+                    {!stockInfo.hasStock ? (
+                      <span className="home-stock-badge sold-out">Agotado</span>
+                    ) : stockInfo.isLowStock ? (
+                      <span className="home-stock-badge low-stock">
+                        Pocas unidades
+                      </span>
+                    ) : null}
 
                     <Link
                       to={`/productos/${product.product_id}`}
@@ -271,9 +327,9 @@ export default function Home() {
                         type="button"
                         className="home-recommended-button"
                         onClick={() => addToCart(product)}
-                        disabled={!hasStock}
+                        disabled={!stockInfo.hasStock}
                       >
-                        {hasStock ? "Añadir al carrito" : "Agotado"}
+                        {stockInfo.hasStock ? "Añadir al carrito" : "Agotado"}
                       </button>
                     </div>
                   </article>

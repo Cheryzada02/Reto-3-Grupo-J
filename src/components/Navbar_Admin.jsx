@@ -152,7 +152,7 @@ export default function Navbar_Admin() {
 
           <span>
             <Mail size={16} />
-            soporteweb@ferreteriaelupina.com.do
+            ferreteriaelupina@gmail.com
           </span>
         </div>
 

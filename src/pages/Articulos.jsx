@@ -60,6 +60,18 @@ export default function Articulos() {
     setMostrarDropdown(false);
   };
 
+  const getStockInfo = (item) => {
+    const stock = Number(item.current_stock ?? item.stock ?? 0);
+    const minStock = Number(item.min_stock ?? 0);
+
+    return {
+      stock,
+      hasStock: stock > 0,
+      isLowStock: stock > 0 && minStock > 0 && stock <= minStock,
+      label: stock === 1 ? "Queda 1 unidad" : `Quedan ${stock} unidades`,
+    };
+  };
+
   if (loading) return <p className="page-loading">Cargando artículos...</p>;
 
   return (
@@ -127,33 +139,45 @@ export default function Articulos() {
         </section>
       ) : (
         <div className="articulos-grid">
-          {productosFiltrados.map((item) => (
-            <div key={item.product_id} className="articulo-card">
-              <img
-                src={item.image_url || "/placeholder-product.png"}
-                alt={item.product_name}
-                className="articulo-img"
-              />
+          {productosFiltrados.map((item) => {
+            const stockInfo = getStockInfo(item);
 
-              <h2>{item.product_name}</h2>
+            return (
+              <div key={item.product_id} className="articulo-card">
+                {!stockInfo.hasStock ? (
+                  <span className="client-stock-badge sold-out">Agotado</span>
+                ) : stockInfo.isLowStock ? (
+                  <span className="client-stock-badge low-stock">
+                    Pocas unidades
+                  </span>
+                ) : null}
 
-              <p>{item.description}</p>
+                <img
+                  src={item.image_url || "/placeholder-product.png"}
+                  alt={item.product_name}
+                  className="articulo-img"
+                />
 
-              <div className="articulo-footer">
-                <span className="precio">
-                  RD$ {Number(item.sale_price || 0).toFixed(2)}
-                </span>
+                <h2>{item.product_name}</h2>
 
-                <span className="stock">
-                  Stock: {item.current_stock}
-                </span>
+                <p>{item.description}</p>
+
+                <div className="articulo-footer">
+                  <span className="precio">
+                    RD$ {Number(item.sale_price || 0).toFixed(2)}
+                  </span>
+
+                  <span className="stock">
+                    Stock: {item.current_stock}
+                  </span>
+                </div>
+
+                <button type="button" className="btn-agregar">
+                  Agregar al carrito
+                </button>
               </div>
-
-              <button type="button" className="btn-agregar">
-                Agregar al carrito
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>

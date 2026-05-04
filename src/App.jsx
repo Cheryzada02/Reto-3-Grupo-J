@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Navbar_Admin from "./components/Navbar_Admin";
 import Footer from "./components/Footer";
 import Chatbot from "./components/Chatbot";
+import AccessibilityWidget from "./components/AccessibilityWidget";
 
 import Home from "./pages/Home";
 import CustomerService from "./pages/CustomerService";
@@ -61,6 +62,7 @@ function App() {
               </Routes>
 
               <Footer />
+              <AccessibilityWidget />
               <Chatbot />
             </>
           ) : (
@@ -84,6 +86,7 @@ function App() {
               </Routes>
 
               <Footer />
+              <AccessibilityWidget />
               <Chatbot />
             </>
           )}

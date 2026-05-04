@@ -424,7 +424,10 @@ export default function Cart() {
             <button
               type="button"
               className="checkout-modal-close"
-              onClick={() => setShowCheckoutDetail(false)}
+              onClick={() => {
+                if (!loading) setShowCheckoutDetail(false);
+              }}
+              disabled={loading}
             >
               <X size={22} />
             </button>
@@ -462,6 +465,15 @@ export default function Cart() {
               Al confirmar, se generará una factura provisional en PDF. El
               pedido debe ser retirado en tienda.
             </p>
+
+            {loading && (
+              <div className="checkout-loading-bar" role="status" aria-live="polite">
+                <div className="checkout-loading-track">
+                  <span />
+                </div>
+                <p>Procesando orden y generando factura...</p>
+              </div>
+            )}
 
             <button
               type="button"

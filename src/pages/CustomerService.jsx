@@ -140,7 +140,7 @@ export default function CustomerService() {
             <Mail size={22} />
             <div>
               <h3>Correo</h3>
-              <p>soporteweb@ferreteriaelupina.com.do</p>
+              <p>ferreteriaelupina@gmail.com</p>
             </div>
           </article>
 

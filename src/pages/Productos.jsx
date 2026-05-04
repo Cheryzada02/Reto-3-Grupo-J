@@ -1,6 +1,6 @@
 import { Heart } from "lucide-react";
 import { Link, useSearchParams, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
@@ -20,12 +20,26 @@ function ProductosPagina() {
   const [departamentos, setDepartamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [columnas, setColumnas] = useState(3);
+  const [ordenProductos, setOrdenProductos] = useState("az");
+  const [precioMaximoFiltro, setPrecioMaximoFiltro] = useState(0);
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("es-DO", {
       style: "currency",
       currency: "DOP",
     }).format(Number(value || 0));
+  };
+
+  const getStockInfo = (producto) => {
+    const stock = Number(producto.current_stock ?? producto.stock ?? 0);
+    const minStock = Number(producto.min_stock ?? 0);
+
+    return {
+      stock,
+      hasStock: stock > 0,
+      isLowStock: stock > 0 && minStock > 0 && stock <= minStock,
+      label: stock === 1 ? "Queda 1 unidad" : `Quedan ${stock} unidades`,
+    };
   };
 
   const crearRutaDepartamento = (texto) => {
@@ -46,8 +60,17 @@ function ProductosPagina() {
         const productosActivos = data.filter(
           (producto) => producto.status === "Activo"
         );
+        const precioMaximoInventario = Math.ceil(
+          Math.max(
+            0,
+            ...productosActivos.map((producto) =>
+              Number(producto.sale_price || 0)
+            )
+          )
+        );
 
         setProductos(productosActivos);
+        setPrecioMaximoFiltro(precioMaximoInventario);
 
         const deps = [
           ...new Map(
@@ -73,20 +96,53 @@ function ProductosPagina() {
     loadProducts();
   }, []);
 
-  const productosFiltrados = productos.filter((producto) => {
-    const matchBusqueda =
-      !searchText ||
-      (producto.product_name?.toLowerCase() || "").includes(searchText) ||
-      (producto.description?.toLowerCase() || "").includes(searchText) ||
-      (producto.supplier_name?.toLowerCase() || "").includes(searchText);
+  const precioMaximoInventario = useMemo(
+    () =>
+      Math.ceil(
+        Math.max(
+          0,
+          ...productos.map((producto) => Number(producto.sale_price || 0))
+        )
+      ),
+    [productos]
+  );
 
-    const rutaProducto = crearRutaDepartamento(producto.department_name);
+  const productosFiltrados = useMemo(() => {
+    return productos
+      .filter((producto) => {
+        const matchBusqueda =
+          !searchText ||
+          (producto.product_name?.toLowerCase() || "").includes(searchText) ||
+          (producto.description?.toLowerCase() || "").includes(searchText) ||
+          (producto.supplier_name?.toLowerCase() || "").includes(searchText);
 
-    const matchDepartamento =
-      !departamentoRuta || rutaProducto === departamentoRuta;
+        const rutaProducto = crearRutaDepartamento(producto.department_name);
 
-    return matchBusqueda && matchDepartamento;
-  });
+        const matchDepartamento =
+          !departamentoRuta || rutaProducto === departamentoRuta;
+
+        const matchPrecio =
+          Number(producto.sale_price || 0) <= precioMaximoFiltro;
+
+        return matchBusqueda && matchDepartamento && matchPrecio;
+      })
+      .sort((a, b) => {
+        const nombreA = (a.product_name || "").localeCompare(
+          b.product_name || "",
+          "es",
+          { sensitivity: "base" }
+        );
+
+        return ordenProductos === "za" ? -nombreA : nombreA;
+      });
+  }, [
+    productos,
+    searchText,
+    departamentoRuta,
+    precioMaximoFiltro,
+    precioMaximoInventario,
+    ordenProductos,
+  ]);
 
   const tituloPagina = departamentoRuta
     ? departamentos.find((dep) => dep.ruta === departamentoRuta)?.name ||
@@ -149,6 +205,38 @@ function ProductosPagina() {
               </li>
             ))}
           </ul>
+
+          <div className="client-product-filters">
+            <h3>Filtros</h3>
+
+            <label>
+              Orden alfabetico
+              <select
+                value={ordenProductos}
+                onChange={(event) => setOrdenProductos(event.target.value)}
+              >
+                <option value="az">A - Z</option>
+                <option value="za">Z - A</option>
+              </select>
+            </label>
+
+            <label>
+              Rango de precio
+              <span className="client-price-filter-value">
+                RD$ 0 - {formatCurrency(precioMaximoFiltro)}
+              </span>
+              <input
+                type="range"
+                min="0"
+                max={precioMaximoInventario}
+                value={precioMaximoFiltro}
+                onChange={(event) =>
+                  setPrecioMaximoFiltro(Number(event.target.value))
+                }
+                disabled={precioMaximoInventario <= 0}
+              />
+            </label>
+          </div>
         </aside>
 
         {!productosFiltrados.length ? (
@@ -159,12 +247,21 @@ function ProductosPagina() {
           >
             {productosFiltrados.map((producto) => {
               const favorito = isFavorite(producto.product_id);
+              const stockInfo = getStockInfo(producto);
 
               return (
                 <article
                   className="surface-card interactive-card client-product-card"
                   key={producto.product_id}
                 >
+                  {!stockInfo.hasStock ? (
+                    <span className="client-stock-badge sold-out">Agotado</span>
+                  ) : stockInfo.isLowStock ? (
+                    <span className="client-stock-badge low-stock">
+                      Pocas unidades
+                    </span>
+                  ) : null}
+
                   <button
                     type="button"
                     className={
@@ -208,11 +305,9 @@ function ProductosPagina() {
                       type="button"
                       className="client-product-button"
                       onClick={() => addToCart(producto)}
-                      disabled={Number(producto.current_stock || 0) <= 0}
+                      disabled={!stockInfo.hasStock}
                     >
-                      {Number(producto.current_stock || 0) > 0
-                        ? "Agregar al carrito"
-                        : "Agotado"}
+                      {stockInfo.hasStock ? "Agregar al carrito" : "Agotado"}
                     </button>
                   </div>
                 </article>

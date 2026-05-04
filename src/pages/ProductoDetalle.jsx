@@ -5,16 +5,19 @@ import { Heart, Share2, Flame, Eye, ShoppingCart } from "lucide-react";
 import { get_products } from "../authentication/db_functions";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
+import { useAlerts } from "../context/AlertContext";
 
 export default function ProductoDetalle() {
   const { id } = useParams();
   const { addToCart } = useCart();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const { showAlert } = useAlerts();
 
   const [producto, setProducto] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [shareLabel, setShareLabel] = useState("Compartir");
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -52,11 +55,54 @@ export default function ProductoDetalle() {
     }).format(Number(value || 0));
   };
 
+  const getStockInfo = (product) => {
+    const stock = Number(product.current_stock ?? product.stock ?? 0);
+    const minStock = Number(product.min_stock ?? 0);
+
+    return {
+      stock,
+      hasStock: stock > 0,
+      isLowStock: stock > 0 && minStock > 0 && stock <= minStock,
+      label: stock === 1 ? "Queda 1 unidad" : `Quedan ${stock} unidades`,
+    };
+  };
+
   const handleAddToCart = () => {
     if (!producto) return;
 
     for (let i = 0; i < quantity; i++) {
       addToCart(producto);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!producto) return;
+
+    const shareUrl = window.location.href;
+    const shareData = {
+      title: producto.product_name,
+      text: `Mira este producto: ${producto.product_name}`,
+      url: shareUrl,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        setShareLabel("Compartido");
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareLabel("Enlace copiado");
+        showAlert("Enlace del producto copiado.", "success");
+      } else {
+        window.prompt("Copia este enlace:", shareUrl);
+        setShareLabel("Copiar enlace");
+      }
+
+      window.setTimeout(() => setShareLabel("Compartir"), 2200);
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        showAlert("No se pudo compartir el producto.", "error");
+      }
     }
   };
 
@@ -76,7 +122,8 @@ export default function ProductoDetalle() {
     );
   }
 
-  const stock = Number(producto.current_stock ?? producto.stock ?? 0);
+  const stockInfo = getStockInfo(producto);
+  const stock = stockInfo.stock;
   const favorito = isFavorite(producto.product_id);
 
   return (
@@ -105,9 +152,14 @@ export default function ProductoDetalle() {
           <div className="product-title-row">
             <h1>{producto.product_name}</h1>
 
-            <button type="button" className="share-button">
+            <button
+              type="button"
+              className="share-button"
+              onClick={handleShare}
+              aria-label={`Compartir ${producto.product_name}`}
+            >
               <Share2 size={20} />
-              Compartir
+              {shareLabel}
             </button>
           </div>
 
@@ -128,9 +180,19 @@ export default function ProductoDetalle() {
 
             <p>
               <strong>Disponibilidad:</strong>{" "}
-              {stock > 0 ? "En stock" : "Agotado"}
+              {!stockInfo.hasStock
+                ? "Agotado"
+                : stockInfo.isLowStock
+                  ? "Pocas unidades"
+                  : "En stock"}
             </p>
           </div>
+
+          {stockInfo.isLowStock && (
+            <div className="product-low-stock-alert">
+              {stockInfo.label} disponibles.
+            </div>
+          )}
 
           <div className="product-description">
             <p>{producto.description}</p>
@@ -214,12 +276,21 @@ export default function ProductoDetalle() {
           <div className="related-products-grid">
             {relatedProducts.map((item) => {
               const isRelatedFavorite = isFavorite(item.product_id);
+              const relatedStockInfo = getStockInfo(item);
 
               return (
                 <article
                   className="surface-card interactive-card related-product-card"
                   key={item.product_id}
                 >
+                  {!relatedStockInfo.hasStock ? (
+                    <span className="client-stock-badge sold-out">Agotado</span>
+                  ) : relatedStockInfo.isLowStock ? (
+                    <span className="client-stock-badge low-stock">
+                      Pocas unidades
+                    </span>
+                  ) : null}
+
                   <button
                     type="button"
                     className={
@@ -260,12 +331,10 @@ export default function ProductoDetalle() {
                     <button
                       type="button"
                       onClick={() => addToCart(item)}
-                      disabled={Number(item.current_stock || 0) <= 0}
+                      disabled={!relatedStockInfo.hasStock}
                     >
                       <ShoppingCart size={16} />
-                      {Number(item.current_stock || 0) > 0
-                        ? "Agregar"
-                        : "Agotado"}
+                      {relatedStockInfo.hasStock ? "Agregar" : "Agotado"}
                     </button>
                   </div>
                 </article>
