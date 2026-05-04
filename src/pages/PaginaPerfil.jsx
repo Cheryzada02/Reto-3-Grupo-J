@@ -26,13 +26,16 @@ import {
   update_user_password,
   upload_image,
   get_customer_order_by_customer_id,
-  get_customer_order_details_by_order_id
+  get_customer_order_details_by_order_id,
+  send_email
 } from "../authentication/db_functions";
 import {
   formatDateOnly,
   formatDateTime,
   formatTimeOnly,
 } from "../utils/dateFormat";
+import { createPdfAttachment } from "../utils/exportEmail";
+import { buildOrderPdf } from "../utils/orderPdf";
 
 export default function PaginaPerfil() {
   const { user } = useAuth();
@@ -83,6 +86,7 @@ export default function PaginaPerfil() {
         setProfileForm({
           full_name: customerData.full_name || "",
           email: customerData.email || "",
+          internal_email: customerData.internal_email || "",
           phone: customerData.phone || "",
           address: customerData.address || "",
           image_url: customerData.image_url || "",
@@ -140,8 +144,9 @@ export default function PaginaPerfil() {
 
   const handleCancelProfileEdit = () => {
     setProfileForm({
-      full_name: customer?.full_name || user.user_name || "",
-      email: customer?.email || user.email || "",
+      full_name: customer?.full_name || "",
+      email: customer?.email || "",
+      internal_email: customer?.internal_email || "",
       phone: customer?.phone || "",
       address: customer?.address || "",
       image_url: customer?.image_url || "",
@@ -281,7 +286,63 @@ export default function PaginaPerfil() {
     await loadOrderDetails(orderId);
   };
 
+  const createOrderPdf = async (order) => {
+    const details = await loadOrderDetails(order.order_id);
+    const invoiceNumber = `FE-${order.order_id}`;
+    const doc = buildOrderPdf({
+      invoiceNumber,
+      items: details,
+      subtotal: order.subtotal,
+      tax: order.tax,
+      total: order.total,
+      orderStatus: order.order_status || "No disponible",
+      paymentStatus: order.payment_status || "No disponible",
+      formatCurrency,
+      createdAt: order.created_at,
+    });
+
+    return {
+      doc,
+      invoiceNumber,
+      filename: `factura-provisional-${invoiceNumber}.pdf`,
+    };
+  };
+
   const downloadOrderPdf = async (order) => {
+    const invoice = await createOrderPdf(order);
+    invoice.doc.save(invoice.filename);
+  };
+
+  const sendOrderPdfEmail = async (order) => {
+    const email = profileForm.email;
+
+    if (!email) {
+      showAlert("No tienes correo de alertas configurado.", "error");
+      return;
+    }
+
+    try {
+      const invoice = await createOrderPdf(order);
+
+      await send_email({
+        to: email,
+        subject: `Copia de factura provisional ${invoice.invoiceNumber}`,
+        message: `
+          <h2>Copia de factura provisional</h2>
+          <p>Adjunto encontrarás la copia de tu factura provisional.</p>
+        `,
+        html: true,
+        attachments: [createPdfAttachment(invoice.doc, invoice.filename)],
+      });
+
+      showAlert("Factura enviada al correo de alertas.", "success");
+    } catch (error) {
+      console.error(error);
+      showAlert("No se pudo enviar la factura por correo.", "error");
+    }
+  };
+
+  const downloadOrderPdfOld = async (order) => {
     const details = await loadOrderDetails(order.order_id);
 
     const doc = new jsPDF();
@@ -430,8 +491,8 @@ export default function PaginaPerfil() {
               />
             </div>
 
-            <h2>{profileForm.full_name || user.user_name}</h2>
-            <p>{profileForm.email || user.email}</p>
+            <h2>{profileForm.full_name }</h2>
+            <p>{profileForm.internal_email}</p>
           </div>
 
           <nav className="perfil-menu">
@@ -722,6 +783,15 @@ export default function PaginaPerfil() {
                           >
                             <FileText size={17} />
                             Descargar PDF
+                          </button>
+
+                          <button
+                            type="button"
+                            className="btn"
+                            onClick={() => sendOrderPdfEmail(order)}
+                          >
+                            <Mail size={17} />
+                            Enviar por correo
                           </button>
                         </div>
 

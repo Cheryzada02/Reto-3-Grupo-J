@@ -361,17 +361,36 @@ export async function get_stock_alerts () {
     return data
 }
 
-export async function send_email() {
+// Send Email
+export async function send_email({
+  to,
+  subject,
+  message,
+  html = true,
+  attachments = [],
+}) {
   try {
+    const csv_base64 = "";
     const { data, error } = await supabase.functions.invoke("Send-Google-Email", {
       body: {
-        to: "raykelvillar@gmail.com",
-        subject: "Confirmación de orden",
+        to,
+        subject: "Reporte de órdenes",
         message: `
-          <h2>Gracias por su compra</h2>
-          <p>Su orden fue recibida correctamente.</p>
+          <h2>Reporte de órdenes</h2>
+          <p>Adjunto encontrarás el archivo CSV generado.</p>
         `,
         html: true,
+        attachments: [
+          {
+            filename: "ordenes.csv",
+            content_type: "text/csv",
+            base64: csv_base64,
+          },
+        ],
+        subject,
+        message,
+        html,
+        attachments,
       },
     });
 
@@ -386,11 +405,30 @@ export async function send_email() {
       throw error;
     }
 
-    console.log("Email sent successfully:", data);
-
     return data;
   } catch (error) {
     console.error("send_email error:", error);
     throw error;
   }
+}
+
+// Get User Profile
+export async function get_user_profile(user_id) {
+    const {data, error} = await supabase.rpc("get_user_profile", {
+    p_user_id: user_id
+    })
+    if (error) throw error
+
+    return data
+}
+
+//Update User Profile
+export async function update_user_profiles(id, email_alert) {
+    const {data, error} = await supabase.rpc("update_user_profiles", {
+    p_user_id: id,
+    p_email: email_alert
+    })
+    if (error) throw error
+
+    return data
 }

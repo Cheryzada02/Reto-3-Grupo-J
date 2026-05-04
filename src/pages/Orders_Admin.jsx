@@ -2,11 +2,26 @@ import { get_orders, update_orders } from "../authentication/db_functions";
 import { useNavigate } from "react-router-dom";
 import {
   Eye,
-  PencilIcon
+  PencilIcon,
+  Save,
+  X
 } from "lucide-react";
 
 import { useState, useEffect } from "react";
 import { formatDateTime } from "../utils/dateFormat";
+import TableExportActions from "../components/TableExportActions";
+
+const orderExportColumns = [
+  { label: "ID Orden", value: "order_id" },
+  { label: "Cliente", value: "customer_name" },
+  { label: "Estado Orden", value: "order_status" },
+  { label: "Estado Pago", value: "payment_status" },
+  { label: "Subtotal", value: "subtotal" },
+  { label: "Impuesto", value: "tax" },
+  { label: "Descuento", value: "discount" },
+  { label: "Total", value: "total" },
+  { label: "Creada En", value: (row) => formatDateTime(row.created_at) },
+];
 
 
 // =======================
@@ -76,8 +91,22 @@ function Order_Row({
       <td className="table-actions">
         {is_editing ? (
           <>
-            <button className="table-action-button" onClick={on_save}>Guardar</button>
-            <button className="table-action-button" onClick={on_cancel}>Cancelar</button>
+            <button
+              className="table-icon-button"
+              onClick={on_save}
+              aria-label="Guardar cambios"
+              title="Guardar cambios"
+            >
+              <Save size={16} />
+            </button>
+            <button
+              className="table-icon-button"
+              onClick={on_cancel}
+              aria-label="Cancelar edicion"
+              title="Cancelar edicion"
+            >
+              <X size={16} />
+            </button>
           </>
         ) : (
           <>
@@ -241,6 +270,13 @@ export default function Orders_Page() {
           <p>Revisa el estado de las órdenes y actualiza su seguimiento.</p>
         </div>
       </div>
+
+      <TableExportActions
+        columns={orderExportColumns}
+        rows={orders}
+        filename="ordenes.csv"
+        title="Ordenes"
+      />
 
       <Order_Table
         orders={orders}

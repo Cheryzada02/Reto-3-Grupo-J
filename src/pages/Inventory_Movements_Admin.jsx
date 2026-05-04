@@ -11,6 +11,18 @@ import {
 
 import { useState, useEffect } from "react";
 import { formatDateTime } from "../utils/dateFormat";
+import TableExportActions from "../components/TableExportActions";
+
+const inventoryExportColumns = [
+  { label: "Fecha", value: (row) => formatDateTime(row.movement_date) },
+  { label: "Producto", value: "product_name" },
+  { label: "Tipo", value: "movement_type" },
+  { label: "Cantidad", value: "quantity" },
+  { label: "Usuario", value: "user_name" },
+  { label: "Email Usuario", value: "user_email" },
+  { label: "Referencia", value: "reference" },
+  { label: "Notas", value: "notes" },
+];
 
 
 // =======================
@@ -268,6 +280,13 @@ export default function Inventory_movements() {
           </span>
         </button>
       </div>
+
+      <TableExportActions
+        columns={inventoryExportColumns}
+        rows={movements}
+        filename="movimientos-inventario.csv"
+        title="Movimientos de inventario"
+      />
 
       <Movement_Table
         movements={movements}

@@ -1180,6 +1180,21 @@ h1 {
   min-width: 220px;
 }
 
+.table-export-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  margin: 0 0 18px;
+}
+
+.table-export-actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
 .orders-table input,
 .orders-table select {
   min-width: 110px;

@@ -6,6 +6,19 @@ import {
 
 import { useState, useEffect } from "react";
 import { formatDateTime } from "../utils/dateFormat";
+import TableExportActions from "../components/TableExportActions";
+
+const orderDetailsExportColumns = [
+  { label: "ID Articulo", value: "order_item_id" },
+  { label: "Estado Orden", value: "order_status" },
+  { label: "Producto", value: "product_name" },
+  { label: "Cantidad", value: "quantity" },
+  { label: "Precio Unitario", value: "unit_price" },
+  { label: "Descuento", value: "discount" },
+  { label: "Total", value: "line_total" },
+  { label: "Creado En", value: (row) => formatDateTime(row.created_at) },
+  { label: "Actualizado En", value: (row) => formatDateTime(row.updated_at) },
+];
 
 
 // =======================
@@ -174,6 +187,13 @@ export default function Orders_detail_Page() {
           Ver todos
         </button>
       </div>
+
+      <TableExportActions
+        columns={orderDetailsExportColumns}
+        rows={filtered_orders_detail}
+        filename="detalle-ordenes.csv"
+        title="Detalle de ordenes"
+      />
 
       <Order_details_Table
         order_detail={filtered_orders_detail}

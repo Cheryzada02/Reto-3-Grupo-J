@@ -3,11 +3,13 @@ import { Trash2, X, CheckCircle } from "lucide-react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useCart } from "../context/CartContext";
-import { check_stock_availablity, get_customer_info, insert_orders, insert_orders_items } from "../authentication/db_functions";
+import { check_stock_availablity, get_customer_info, insert_orders, insert_orders_items, send_email } from "../authentication/db_functions";
 import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
 import { useNavigate } from "react-router-dom";
 import { formatDateOnly, formatTimeOnly } from "../utils/dateFormat";
+import { createPdfAttachment } from "../utils/exportEmail";
+import { buildOrderPdf } from "../utils/orderPdf";
 
 export default function Cart() {
   const {
@@ -127,6 +129,33 @@ export default function Cart() {
     doc.save(`factura-provisional-${numeroFactura}.pdf`);
   };
 
+  const createInvoicePdf = (
+    invoiceItems = cartItems,
+    invoiceSubtotal = subtotal,
+    invoiceTax = tax,
+    invoiceTotal = total,
+    invoiceNumber = `FE-${Date.now()}`
+  ) => {
+    const doc = buildOrderPdf({
+      invoiceNumber,
+      items: invoiceItems,
+      subtotal: invoiceSubtotal,
+      tax: invoiceTax,
+      total: invoiceTotal,
+      paymentMethod:
+        paymentMethod === "efectivo"
+          ? "Efectivo al retirar"
+          : "Transferencia bancaria",
+      formatCurrency,
+    });
+
+    return {
+      doc,
+      invoiceNumber,
+      filename: `factura-provisional-${invoiceNumber}.pdf`,
+    };
+  };
+
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       showAlert("El carrito está vacío.", "error");
@@ -150,6 +179,7 @@ export default function Cart() {
 
     set_loading(true);
     let errors = false
+    let customerData = null;
 
     for (const item of cartItems) {
       
@@ -172,7 +202,7 @@ export default function Cart() {
 
       try {
         const response_customer = await get_customer_info(user.user_id)
-        const customerData = Array.isArray(response_customer) ? response_customer[0] : response_customer
+        customerData = Array.isArray(response_customer) ? response_customer[0] : response_customer
 
         if (!customerData?.customer_id) {
           showAlert("No se pudo encontrar la informacion del cliente.", "error");
@@ -204,19 +234,34 @@ export default function Cart() {
       }
       
       if (!errors) {
+        
+        const invoice = createInvoicePdf(cartItems, subtotal, tax, total);
+
+        if (customerData?.email) {
+          try {
+            await send_email({
+              to: customerData.email,
+              subject: `Factura provisional ${invoice.invoiceNumber}`,
+              message: `
+                <h2>Orden recibida</h2>
+                <p>Adjunto encontrarás la factura provisional de tu orden.</p>
+                <p>Recuerda que tu pedido es para retiro en tienda.</p>
+              `,
+              html: true,
+              attachments: [createPdfAttachment(invoice.doc, invoice.filename)],
+            });
+          } catch (error) {
+            console.error("No se pudo enviar la factura por correo:", error);
+          }
+        }
+        
         showAlert("Orden confirmada correctamente.", "success");
 
-        const shouldDownloadInvoice = window.confirm(
-          "Orden confirmada correctamente. ¿Deseas descargar la factura provisional en PDF?"
-        );
-
-        if (shouldDownloadInvoice) {
-          generarFacturaProvisionalPDF(cartItems, subtotal, tax, total);
-        }
-    
         clearCart();
         setShowCheckoutDetail(false);
         set_loading(false);
+
+        
       }
     }
   };

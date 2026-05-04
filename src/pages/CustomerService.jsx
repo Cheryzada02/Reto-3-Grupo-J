@@ -9,7 +9,6 @@ import {
   Send,
 } from "lucide-react";
 
-import { sendCustomerRequest } from "../api/customerServiceApi";
 import { send_email } from "../authentication/db_functions";
 
 export default function CustomerService() {
@@ -67,7 +66,18 @@ export default function CustomerService() {
         message: "Enviando solicitud...",
       });
 
-      await send_email();
+      await send_email({
+        to: formData.email,
+        subject: "Solicitud recibida - Ferretería Elupina",
+        message: `
+          <h2>Solicitud recibida</h2>
+          <p>Hola ${formData.name},</p>
+          <p>Recibimos tu solicitud sobre <strong>${formData.subject}</strong>. Nuestro equipo de soporte la revisará y te responderá pronto.</p>
+          <p><strong>Mensaje:</strong></p>
+          <p>${formData.message}</p>
+        `,
+        html: true,
+      });
 
       setStatus({
         type: "success",

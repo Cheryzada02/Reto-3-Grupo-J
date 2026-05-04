@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, Search } from "lucide-react";
 
 import { get_products, get_stock_alerts } from "../authentication/db_functions";
 import { formatDateTime } from "../utils/dateFormat";
+import TableExportActions from "../components/TableExportActions";
 
 function formatAlertType(type) {
   if (!type) return "Alerta";
@@ -31,6 +32,21 @@ function isAlertResolved(alert) {
 
   return Boolean(value);
 }
+
+const stockAlertsExportColumns = [
+  { label: "Alerta", value: "alert_id" },
+  { label: "Producto ID", value: "product_id" },
+  { label: "Producto", value: "product_name" },
+  { label: "Tipo", value: (row) => formatAlertType(row.alert_type) },
+  { label: "Valor minimo", value: (row) => getThresholdValue(row) },
+  { label: "Valor actual", value: "current_value" },
+  {
+    label: "Estado",
+    value: (row) => (isAlertResolved(row) ? "Resuelta" : "Pendiente"),
+  },
+  { label: "Creada", value: (row) => formatDateTime(row.created_at) },
+  { label: "Actualizada", value: (row) => formatDateTime(row.updated_at) },
+];
 
 function StockAlertRow({ alert }) {
   const resolved = isAlertResolved(alert);
@@ -166,6 +182,13 @@ export default function StockAlertsPage() {
           onChange={(event) => setSearchText(event.target.value)}
         />
       </label>
+
+      <TableExportActions
+        columns={stockAlertsExportColumns}
+        rows={filteredAlerts}
+        filename="alertas-stock.csv"
+        title="Alertas de stock"
+      />
 
       {loading ? (
         <p className="estado">Cargando alertas de stock...</p>
