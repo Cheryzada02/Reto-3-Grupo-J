@@ -2,7 +2,7 @@ import { Phone, MapPin, MessageCircle, Clock, CreditCard, Wrench } from "lucide-
 
 export default function Footer() {
   
-  const numeroWhatsApp = "18095369114"; // IMPORTANTE: sin +
+  const numeroWhatsApp = "18095369114";
   
   const mensajeWhatsApp = encodeURIComponent(
     "Hola, estoy interesado en productos de la Ferreteria Elupina. ¿Podrían brindarme más información?"

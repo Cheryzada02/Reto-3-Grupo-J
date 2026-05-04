@@ -5,7 +5,6 @@ const CartContext = createContext();
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
 
-  // AGREGAR PRODUCTO
   const addToCart = (product) => {
     setCartItems((prevItems) => {
       const existingProduct = prevItems.find(
@@ -24,14 +23,12 @@ export function CartProvider({ children }) {
     });
   };
 
-  // ELIMINAR PRODUCTO
   const removeFromCart = (productId) => {
     setCartItems((prevItems) =>
       prevItems.filter((item) => item.product_id !== productId)
     );
   };
 
-  // ACTUALIZAR CANTIDAD
   const updateQuantity = (productId, quantity) => {
     if (quantity < 1) return;
 
@@ -44,7 +41,6 @@ export function CartProvider({ children }) {
     );
   };
 
-  // LIMPIAR CARRITO
   const clearCart = () => {
     setCartItems([]);
   };
@@ -56,7 +52,6 @@ export function CartProvider({ children }) {
     0
   );
 
-  // 🔥 TOTAL DE ARTÍCULOS (LO QUE NECESITAS PARA EL NAVBAR)
   const cartCount = cartItems.reduce(
     (total, item) => total + item.quantity,
     0
@@ -71,7 +66,7 @@ export function CartProvider({ children }) {
         updateQuantity,
         clearCart,
         cartTotal,
-        cartCount, // ← IMPORTANTE
+        cartCount,
       }}
     >
       {children}

@@ -83,10 +83,13 @@ export default function ProductSearch({ className = "navbar-search" }) {
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => goToProduct(product.product_id)}
                 >
-                  <img
-                    src={product.image_url || "/placeholder-product.png"}
+                  {product.image_url ? <img
+                    src={product.image_url}
                     alt={product.product_name}
-                  />
+                    loading="lazy"
+                  /> : (
+                    <span>📦</span>
+                  )}
 
                   <span>
                     <strong>{product.product_name}</strong>

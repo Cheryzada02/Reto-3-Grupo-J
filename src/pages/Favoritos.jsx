@@ -62,11 +62,12 @@ export default function Favoritos() {
                   to={`/productos/${product.product_id}`}
                   className="client-product-image favorite-image"
                 >
-                  <img
-                    src={product.image_url || "/placeholder-product.png"}
+                  {product.image_url ? <img
+                    src={product.image_url}
                     alt={product.product_name}
-                    loading="lazy"
-                  />
+                  /> : (
+                    <span>📦</span>
+                  )}
                 </Link>
 
                 <div className="client-product-body favorite-info">

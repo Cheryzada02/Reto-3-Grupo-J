@@ -115,10 +115,12 @@ export default function Articulos() {
                 className="articulos-search-option"
                 onClick={() => seleccionarProductoRelacionado(producto)}
               >
-                <img
-                  src={producto.image_url || "/placeholder-product.png"}
+                {producto.image_url ? <img
+                  src={producto.image_url}
                   alt={producto.product_name}
-                />
+                /> : (
+                  <span>📦</span>
+                )}
 
                 <span>
                   <strong>{producto.product_name}</strong>
@@ -152,11 +154,13 @@ export default function Articulos() {
                   </span>
                 ) : null}
 
-                <img
-                  src={item.image_url || "/placeholder-product.png"}
+                {item.image_url ? <img
+                  src={item.image_url}
                   alt={item.product_name}
                   className="articulo-img"
-                />
+                /> : (
+                  <span>📦</span>
+                )}
 
                 <h2>{item.product_name}</h2>
 

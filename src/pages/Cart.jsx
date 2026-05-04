@@ -286,11 +286,14 @@ export default function Cart() {
           <div className="cart-items">
             {cartItems.map((item) => (
               <article className="surface-card cart-item" key={item.product_id}>
-                <img
-                  src={item.image_url || "/placeholder-product.png"}
+
+                {item.image_url ? <img
+                  src={item.image_url}
                   alt={item.product_name}
                   className="cart-item-image"
-                />
+                /> : (
+                  <span>📦</span>
+                )}
 
                 <div className="cart-item-info">
                   <h2>{item.product_name}</h2>

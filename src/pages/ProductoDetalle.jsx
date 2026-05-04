@@ -141,10 +141,13 @@ export default function ProductoDetalle() {
           <div className="product-main-image">
             <span className="offer-badge">Oferta</span>
 
-            <img
-              src={producto.image_url || "/placeholder-product.png"}
+            {producto.image_url ? <img
+              src={producto.image_url}
               alt={producto.product_name}
-            />
+            /> : (
+              <span>📦</span>
+            )}
+
           </div>
         </div>
 
@@ -170,12 +173,12 @@ export default function ProductoDetalle() {
 
           <div className="product-meta">
             <p>
-              <strong>Marca:</strong>{" "}
-              {producto.brand || producto.supplier_name || "Ferretería Elupina"}
+              <strong>Departamento:</strong>{" "}
+              {producto.department_name}
             </p>
 
             <p>
-              <strong>SKU:</strong> {producto.sku || producto.product_id}
+              <strong>SKU:</strong> {producto.product_id}
             </p>
 
             <p>
@@ -312,11 +315,13 @@ export default function ProductoDetalle() {
                     to={`/productos/${item.product_id}`}
                     className="related-product-image"
                   >
-                    <img
-                      src={item.image_url || "/placeholder-product.png"}
+                    {item.image_url ? <img
+                      src={item.image_url}
                       alt={item.product_name}
                       loading="lazy"
-                    />
+                    /> : (
+                      <span>📦</span>
+                    )}
                   </Link>
 
                   <div className="related-product-body">

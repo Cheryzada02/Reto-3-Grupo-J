@@ -1693,6 +1693,7 @@ h1 {
   justify-content: center;
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+  background-color: var(--color-surface);
 }
 
 .product-main-image img {
