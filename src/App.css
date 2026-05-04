@@ -1438,21 +1438,6 @@ h1 {
   gap: 7px;
 }
 
-@media (max-width: 720px) {
-  .stock-low-header {
-    display: grid;
-    align-items: start;
-  }
-
-  .stock-detail-header {
-    grid-template-columns: 1fr;
-  }
-
-  .stock-detail-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .orders-table input,
 .orders-table select {
   min-width: 110px;
@@ -2500,45 +2485,6 @@ h1 {
   transform: translateY(-2px);
 }
 
-@media (max-width: 1100px) {
-  .home-recommended-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 860px) {
-  .home-recommended-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 640px) {
-  .home-recommended-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 16px;
-  }
-
-  .home-recommended-image {
-    min-height: 160px;
-  }
-
-  .home-recommended-image img {
-    height: 150px;
-    padding: 10px;
-  }
-
-  .home-recommended-body h3 {
-    min-height: 58px;
-    font-size: 14px;
-  }
-
-  .home-recommended-button {
-    min-height: 44px;
-    padding: 10px 8px;
-    font-size: 12px;
-  }
-}
-
 .home-cta {
   margin-top: 50px;
   background: linear-gradient(
@@ -3477,19 +3423,6 @@ h1 {
   gap: 10px;
   align-items: center;
 }
-
-@media (max-width: 680px) {
-  .about-intro,
-  .about-values,
-  .about-admin-section-header {
-    display: grid;
-  }
-
-  .about-values-list {
-    justify-content: flex-start;
-  }
-}
-
 
 /* =========================
    CUSTOMER SERVICE PAGE
@@ -5048,16 +4981,4 @@ h1 {
 .accessibility-reset:hover {
   background-color: var(--color-accent);
   color: white;
-}
-
-@media (max-width: 640px) {
-  .accessibility-widget {
-    left: 18px;
-    bottom: 18px;
-  }
-
-  .accessibility-toggle {
-    width: 54px;
-    height: 54px;
-  }
 }
