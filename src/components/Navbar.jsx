@@ -208,13 +208,6 @@ export default function Navbar() {
         </NavLink>
 
         <NavLink
-          to="/perfil"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Perfil
-        </NavLink>
-
-        <NavLink
           to="/servicio-cliente"
           className={({ isActive }) => (isActive ? "active" : "")}
         >
@@ -227,6 +220,14 @@ export default function Navbar() {
         >
           Sobre nosotros
         </NavLink>
+
+        <NavLink
+          to="/perfil"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
+          Perfil
+        </NavLink>
+
       </nav>
     </header>
   );
