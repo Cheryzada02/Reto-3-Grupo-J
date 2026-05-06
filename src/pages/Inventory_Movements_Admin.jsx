@@ -258,7 +258,7 @@ export default function Inventory_movements() {
   };
 
   return (
-    <div className="page-shell page-container">
+    <div className="page-shell page-container inventory-admin-page">
 
       <div className="page-hero page-header-admin">
         <div>

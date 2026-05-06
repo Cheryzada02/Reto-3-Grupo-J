@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 
 const STORAGE_KEY = "elupina-accessibility-settings";
+const CLOSE_CHATBOT_EVENT = "elupina-close-chatbot";
+const CLOSE_ACCESSIBILITY_EVENT = "elupina-close-accessibility";
 
 const defaultSettings = {
   largeText: false,
@@ -95,6 +97,14 @@ export default function AccessibilityWidget() {
     return () => window.removeEventListener("keydown", closeWithEscape);
   }, []);
 
+  useEffect(() => {
+    const closeAccessibility = () => setIsOpen(false);
+
+    window.addEventListener(CLOSE_ACCESSIBILITY_EVENT, closeAccessibility);
+    return () =>
+      window.removeEventListener(CLOSE_ACCESSIBILITY_EVENT, closeAccessibility);
+  }, []);
+
   const toggleOption = (key) => {
     setSettings((currentSettings) => ({
       ...currentSettings,
@@ -114,6 +124,14 @@ export default function AccessibilityWidget() {
     mainContent.setAttribute("tabindex", "-1");
     mainContent.focus({ preventScroll: false });
     setIsOpen(false);
+  };
+
+  const toggleAccessibilityPanel = () => {
+    if (!isOpen) {
+      window.dispatchEvent(new Event(CLOSE_CHATBOT_EVENT));
+    }
+
+    setIsOpen((currentValue) => !currentValue);
   };
 
   return (
@@ -192,7 +210,7 @@ export default function AccessibilityWidget() {
       <button
         type="button"
         className="accessibility-toggle"
-        onClick={() => setIsOpen((currentValue) => !currentValue)}
+        onClick={toggleAccessibilityPanel}
         aria-label="Abrir opciones de accesibilidad"
         aria-expanded={isOpen}
       >

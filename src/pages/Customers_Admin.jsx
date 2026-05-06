@@ -87,7 +87,7 @@ export default function Customer_page() {
 
 
   return (
-    <div className="page-shell page-container">
+    <div className="page-shell page-container customers-admin-page">
 
       <div className="page-hero page-header-admin">
         <div>

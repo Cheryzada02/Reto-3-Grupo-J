@@ -20,6 +20,9 @@ const initialMessages = [
   },
 ];
 
+const CLOSE_CHATBOT_EVENT = "elupina-close-chatbot";
+const CLOSE_ACCESSIBILITY_EVENT = "elupina-close-accessibility";
+
 const stopWords = new Set([
   "para",
   "como",
@@ -119,6 +122,13 @@ export default function Chatbot() {
       setHasUnreadGuestMessage(false);
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const closeChatbot = () => setIsOpen(false);
+
+    window.addEventListener(CLOSE_CHATBOT_EVENT, closeChatbot);
+    return () => window.removeEventListener(CLOSE_CHATBOT_EVENT, closeChatbot);
+  }, []);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -398,13 +408,12 @@ export default function Chatbot() {
   };
 
   const toggleChat = () => {
-    setIsOpen((current) => {
-      if (!current) {
-        setHasUnreadGuestMessage(false);
-      }
+    if (!isOpen) {
+      setHasUnreadGuestMessage(false);
+      window.dispatchEvent(new Event(CLOSE_ACCESSIBILITY_EVENT));
+    }
 
-      return !current;
-    });
+    setIsOpen((current) => !current);
   };
 
   const showUnreadBadge = !user && !isOpen && hasUnreadGuestMessage;

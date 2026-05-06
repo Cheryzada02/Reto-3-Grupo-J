@@ -8,6 +8,7 @@ import {
   LogOut,
   X,
   AlertTriangle,
+  Menu,
 } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +16,8 @@ import ProductSearch from "./ProductSearch";
 import { get_products, get_stock_alerts } from "../authentication/db_functions";
 
 const STOCK_ALERTS_UPDATED_EVENT = "stock-alerts-updated";
+const CLOSE_CHATBOT_EVENT = "elupina-close-chatbot";
+const CLOSE_ACCESSIBILITY_EVENT = "elupina-close-accessibility";
 
 function getThresholdValue(alert) {
   return Number(alert.thershold_value ?? alert.threshold_value ?? Number.POSITIVE_INFINITY);
@@ -40,6 +43,7 @@ export default function Navbar_Admin() {
   const [isNotificationsOpen, set_is_notifications_open] = useState(false);
   const [stockAlerts, set_stock_alerts] = useState([]);
   const [isStockPromptOpen, set_is_stock_prompt_open] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isLoggedIn = Boolean(user?.role_id);
   const unresolvedStockAlerts = stockAlerts.filter(
@@ -52,8 +56,25 @@ export default function Navbar_Admin() {
     ? "navbar-action navbar-logout"
     : "hide";
 
+  const closeFloatingWidgets = () => {
+    window.dispatchEvent(new Event(CLOSE_CHATBOT_EVENT));
+    window.dispatchEvent(new Event(CLOSE_ACCESSIBILITY_EVENT));
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const closeAllOverlays = () => {
+    closeMobileMenu();
+    set_is_notifications_open(false);
+    set_is_stock_prompt_open(false);
+    closeFloatingWidgets();
+  };
+
   const handle_log_out = () => {
     logout();
+    closeAllOverlays();
     navigate("/");
   };
 
@@ -135,14 +156,38 @@ export default function Navbar_Admin() {
     };
   }, [user]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "mobile-menu-open",
+      isMobileMenuOpen
+    );
+
+    if (isMobileMenuOpen) {
+      set_is_notifications_open(false);
+      set_is_stock_prompt_open(false);
+      closeFloatingWidgets();
+    }
+
+    return () => {
+      document.documentElement.classList.remove("mobile-menu-open");
+    };
+  }, [isMobileMenuOpen]);
+
   const openStockAlertsPage = () => {
     set_is_stock_prompt_open(false);
     set_is_notifications_open(false);
+    setIsMobileMenuOpen(false);
     navigate("/stock-alerts");
   };
 
   return (
-    <header className="navbar navbar-admin">
+    <header
+      className={
+        isMobileMenuOpen
+          ? "navbar navbar-admin navbar-mobile-open"
+          : "navbar navbar-admin"
+      }
+    >
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
@@ -150,10 +195,10 @@ export default function Navbar_Admin() {
             +1(809)-536-9114
           </span>
 
-          <span>
+          <a href="mailto:ferreteriaelupina@gmail.com" onClick={closeAllOverlays}>
             <Mail size={16} />
             ferreteriaelupina@gmail.com
-          </span>
+          </a>
         </div>
 
         <Link to="/faq" className="navbar-faq">
@@ -162,10 +207,20 @@ export default function Navbar_Admin() {
       </div>
 
       <div className="navbar-main">
-        <Link to="/dashboard" className="navbar-logo">
+        <Link to="/dashboard" className="navbar-logo" onClick={closeAllOverlays}>
           <img src="/logo-elupina.svg" alt="Ferreteria Elupina Admin" />
           <span>Admin</span>
         </Link>
+
+        <button
+          type="button"
+          className="navbar-mobile-toggle"
+          onClick={() => setIsMobileMenuOpen((current) => !current)}
+          aria-label={isMobileMenuOpen ? "Cerrar menu" : "Abrir menu"}
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
 
         <ProductSearch />
 
@@ -173,7 +228,10 @@ export default function Navbar_Admin() {
           <button
             type="button"
             className="navbar-action notification-button"
-            onClick={() => set_is_notifications_open(true)}
+            onClick={() => {
+              closeAllOverlays();
+              set_is_notifications_open(true);
+            }}
             aria-label="Abrir notificaciones"
           >
             <Bell size={24} />
@@ -187,7 +245,7 @@ export default function Navbar_Admin() {
             </span>
           </button>
 
-          <Link to={login} className="navbar-action">
+          <Link to={login} className="navbar-action" onClick={closeAllOverlays}>
             <User size={28} />
 
             <span>
@@ -216,6 +274,7 @@ export default function Navbar_Admin() {
           to="/dashboard"
           end
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Dashboard
         </NavLink>
@@ -223,6 +282,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/productos"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Productos
         </NavLink>
@@ -230,6 +290,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/departamentos"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Departamentos
         </NavLink>
@@ -237,6 +298,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/suplidores"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Suplidores
         </NavLink>
@@ -244,6 +306,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/inventory_movements"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Inventario
         </NavLink>
@@ -251,6 +314,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/customers"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Clientes
         </NavLink>
@@ -258,6 +322,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/orders"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Ordenes
         </NavLink>
@@ -265,6 +330,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/orders_details"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Detalle Ordenes
         </NavLink>
@@ -272,6 +338,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/stock-alerts"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Alertas Stock
         </NavLink>
@@ -279,6 +346,7 @@ export default function Navbar_Admin() {
         <NavLink
           to="/sobre-nosotros"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Sobre Nosotros
         </NavLink>

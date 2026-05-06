@@ -8,6 +8,8 @@ import {
   Headphones,
   ChevronDown,
   LogOut,
+  Menu,
+  X,
 } from "lucide-react";
 
 import { useCart } from "../context/CartContext";
@@ -15,11 +17,15 @@ import { useAuth } from "../context/AuthContext";
 import { get_customer_info, get_departments } from "../authentication/db_functions";
 import ProductSearch from "./ProductSearch";
 
+const CLOSE_CHATBOT_EVENT = "elupina-close-chatbot";
+const CLOSE_ACCESSIBILITY_EVENT = "elupina-close-accessibility";
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [departamentos, set_departamentos] = useState([]);
   const [showDepartments, setShowDepartments] = useState(false);
   const [profileImage, setProfileImage] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigate = useNavigate();
   const { cartCount } = useCart();
@@ -36,14 +42,30 @@ export default function Navbar() {
     setShowDepartments(false);
   };
 
+  const closeFloatingWidgets = () => {
+    window.dispatchEvent(new Event(CLOSE_CHATBOT_EVENT));
+    window.dispatchEvent(new Event(CLOSE_ACCESSIBILITY_EVENT));
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+    closeDepartments();
+  };
+
+  const closeAllOverlays = () => {
+    closeMobileMenu();
+    closeFloatingWidgets();
+  };
+
   const handleViewAllProducts = (e) => {
     e.stopPropagation();
     navigate("/productos");
-    closeDepartments();
+    closeAllOverlays();
   };
 
   const handleLogout = () => {
     logout();
+    closeAllOverlays();
     navigate("/");
   };
 
@@ -59,6 +81,19 @@ export default function Navbar() {
   useEffect(() => {
     load_departments();
   }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle(
+      "mobile-menu-open",
+      isMobileMenuOpen
+    );
+
+    if (isMobileMenuOpen) closeFloatingWidgets();
+
+    return () => {
+      document.documentElement.classList.remove("mobile-menu-open");
+    };
+  }, [isMobileMenuOpen]);
 
   useEffect(() => {
     if (!user?.user_id) {
@@ -90,7 +125,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="navbar">
+    <header className={isMobileMenuOpen ? "navbar navbar-mobile-open" : "navbar"}>
       <div className="navbar-top">
         <div className="navbar-contact">
           <span>
@@ -98,7 +133,7 @@ export default function Navbar() {
             +1(809)-536-9114
           </span>
 
-          <Link to="/servicio-cliente">
+          <Link to="/servicio-cliente" onClick={closeAllOverlays}>
             <Mail size={16} />
             ferreteriaelupina@gmail.com
           </Link>
@@ -110,14 +145,35 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-main">
-        <Link to="/" className="navbar-logo">
+        <Link to="/" className="navbar-logo" onClick={closeAllOverlays}>
           <img src="/logo-elupina.svg" alt="Ferreteria Elupina" />
         </Link>
+
+        <button
+          type="button"
+          className="navbar-mobile-toggle"
+          onClick={() => setIsMobileMenuOpen((current) => !current)}
+          aria-label={isMobileMenuOpen ? "Cerrar menu" : "Abrir menu"}
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {isLoggedIn && (
+          <button
+            type="button"
+            className="navbar-mobile-logout"
+            onClick={handleLogout}
+            aria-label="Cerrar sesion"
+          >
+            <LogOut size={23} />
+          </button>
+        )}
 
         <ProductSearch />
 
         <div className="navbar-actions">
-          <Link to={profileLink} className="navbar-action">
+          <Link to={profileLink} className="navbar-action" onClick={closeAllOverlays}>
             {isLoggedIn && profileImage ? (
               <img
                 src={profileImage}
@@ -132,14 +188,14 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <Link to="/favoritos" className="navbar-action">
+          <Link to="/favoritos" className="navbar-action" onClick={closeAllOverlays}>
             <Heart size={26} />
             <span>
               Lista de <strong>favoritos</strong>
             </span>
           </Link>
 
-          <Link to="/carrito" className="navbar-action cart">
+          <Link to="/carrito" className="navbar-action cart" onClick={closeAllOverlays}>
             <ShoppingCart size={26} />
             <span className="cart-count">{cartCount}</span>
             <span>
@@ -163,6 +219,15 @@ export default function Navbar() {
       </div>
 
       <nav className="navbar-menu">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
+        >
+          Inicio
+        </NavLink>
+
         <div className="department-wrapper">
           <button
             type="button"
@@ -179,11 +244,19 @@ export default function Navbar() {
 
           {showDepartments && (
             <div className="department-dropdown">
+              <Link
+                to="/productos"
+                className="navbar-department-all"
+                onClick={closeAllOverlays}
+              >
+                Ver todos
+              </Link>
+
               {departamentos.map((departamento) => (
                 <Link
                   key={departamento.department_id}
                   to={`/departamentos/${crearRutaDepartamento(departamento.department_name)}`}
-                  onClick={closeDepartments}
+                  onClick={closeAllOverlays}
                 >
                   {departamento.department_name}
                 </Link>
@@ -193,16 +266,9 @@ export default function Navbar() {
         </div>
 
         <NavLink
-          to="/"
-          end
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Inicio
-        </NavLink>
-
-        <NavLink
           to="/productos"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Productos
         </NavLink>
@@ -210,6 +276,7 @@ export default function Navbar() {
         <NavLink
           to="/servicio-cliente"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Soporte
         </NavLink>
@@ -217,6 +284,7 @@ export default function Navbar() {
         <NavLink
           to="/sobre-nosotros"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Sobre nosotros
         </NavLink>
@@ -224,8 +292,19 @@ export default function Navbar() {
         <NavLink
           to="/perfil"
           className={({ isActive }) => (isActive ? "active" : "")}
+          onClick={closeAllOverlays}
         >
           Perfil
+        </NavLink>
+
+        <NavLink
+          to="/faq"
+          className={({ isActive }) =>
+            isActive ? "navbar-mobile-only active" : "navbar-mobile-only"
+          }
+          onClick={closeAllOverlays}
+        >
+          Preguntas frecuentes
         </NavLink>
 
       </nav>
