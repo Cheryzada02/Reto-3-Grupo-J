@@ -46,7 +46,7 @@ export async function insert_into_suppliers(name, phone, email, address) {
     return data
 }
 
-//Update Supplier
+//Update Supplie
 export async function update_suppliers(id, name, phone, email, address) {
     const {data, error} = await supabase.rpc("update_suppliers", {
     p_id: id,
