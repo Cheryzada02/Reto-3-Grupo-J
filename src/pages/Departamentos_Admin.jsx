@@ -207,7 +207,7 @@ export default function Departments_page() {
 
 
   return (
-    <div className="page-shell page-container">
+    <div className="page-shell page-container departments-admin-page">
       <div className="page-hero page-header-admin">
         <div>
           <span>Administración</span>

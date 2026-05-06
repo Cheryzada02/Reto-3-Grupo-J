@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { get_products } from "../authentication/db_functions";
-import "./Articulos.css";
 
 export default function Articulos() {
   const [articulos, setArticulos] = useState([]);

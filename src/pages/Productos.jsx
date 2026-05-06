@@ -163,7 +163,7 @@ function ProductosPagina() {
         <div>
           <span>Catalogo de productos</span>
           <h1>{tituloPagina}</h1>
-          <p>Explora los productos disponibles y ajusta la vista a tu gusto.</p>
+          <p>Explora los productos disponibles.</p>
         </div>
 
         <div className="products-column-control" aria-label="Columnas de productos">

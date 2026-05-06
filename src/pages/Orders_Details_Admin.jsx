@@ -158,7 +158,7 @@ export default function Orders_detail_Page() {
   };
 
   return (
-    <div className="page-shell page-container">
+    <div className="page-shell page-container order-details-admin-page">
 
       <div className="page-hero page-header-admin">
         <div>
