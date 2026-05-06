@@ -22,7 +22,7 @@ export default function Registro() {
     const formData = new FormData(e.currentTarget);
 
     const fullName = formData.get("full_name")?.trim();
-    const username = formData.get("email")?.trim();
+    const username = formData.get("email")?.trim().lower();
     const password = formData.get("password");
     const confirmPassword = formData.get("confirm_password");
 
