@@ -70,7 +70,7 @@ export async function get_products () {
 }
 
 // Insert Products 
-export async function insert_into_products(name, description, supplier_id, cost_price, sale_price, current_stock, min_stock, status, image_url) {
+export async function insert_into_products(name, description, supplier_id, cost_price, sale_price, current_stock, min_stock, status, image_url, department_id) {
     const {data, error} = await supabase.rpc("insert_product", {
     p_name: name,
     p_description: description,
@@ -80,7 +80,8 @@ export async function insert_into_products(name, description, supplier_id, cost_
     p_stock: current_stock,
     p_min: min_stock,
     p_status: status,
-    p_image_url: image_url
+    p_image_url: image_url,
+    p_department_id: department_id
     })
     if (error) throw error
 
@@ -88,7 +89,7 @@ export async function insert_into_products(name, description, supplier_id, cost_
 }
 
 //Update Products
-export async function update_products(id, name, description, supplier_id, cost_price, sale_price, current_stock, min_stock, status, image_url) {
+export async function update_products(id, name, description, supplier_id, cost_price, sale_price, current_stock, min_stock, status, image_url, department_id) {
     const {data, error} = await supabase.rpc("update_product", {
     p_id: id,
     p_name: name,
@@ -99,7 +100,8 @@ export async function update_products(id, name, description, supplier_id, cost_p
     p_stock: current_stock,
     p_min: min_stock,
     p_status: status,
-    p_image_url: image_url
+    p_image_url: image_url,
+    p_department_id: department_id
     })
     if (error) throw error
 
