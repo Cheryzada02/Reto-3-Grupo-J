@@ -70,9 +70,7 @@ export default function ProductoDetalle() {
   const handleAddToCart = () => {
     if (!producto) return;
 
-    for (let i = 0; i < quantity; i++) {
-      addToCart(producto);
-    }
+    addToCart(producto, quantity);
   };
 
   const handleShare = async () => {

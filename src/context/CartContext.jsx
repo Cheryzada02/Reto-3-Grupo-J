@@ -1,11 +1,15 @@
 import { createContext, useContext, useState } from "react";
+import { useAlerts } from "./AlertContext";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
+  const { showAlert } = useAlerts();
 
-  const addToCart = (product) => {
+  const addToCart = (product, quantity = 1) => {
+    const quantityToAdd = Math.max(1, Number(quantity) || 1);
+
     setCartItems((prevItems) => {
       const existingProduct = prevItems.find(
         (item) => item.product_id === product.product_id
@@ -14,13 +18,15 @@ export function CartProvider({ children }) {
       if (existingProduct) {
         return prevItems.map((item) =>
           item.product_id === product.product_id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + quantityToAdd }
             : item
         );
       }
 
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prevItems, { ...product, quantity: quantityToAdd }];
     });
+
+    showAlert("Producto agregado al carrito correctamente.", "success");
   };
 
   const removeFromCart = (productId) => {
