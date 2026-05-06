@@ -63,7 +63,7 @@ function getStatusClass(status) {
 }
 
 function getMovementIcon(type) {
-  return type === "ENTRADA" ? <ArrowUpRight size={17} /> : <ArrowDownRight size={17} />;
+  return type === "ENTRADA" ? <ArrowDownRight size={17} /> : <ArrowUpRight size={17} />;
 }
 
 function SummaryCard({ icon, label, value, helper }) {

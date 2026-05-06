@@ -151,7 +151,7 @@ export default function Chatbot() {
   const productMatchers = useMemo(
     () =>
       products.map((product) => {
-        const stock = Number(product.current_stock ?? product.stock ?? 0);
+        const stock = Number(product.current_stock ?? 0);
         const minStock = Number(product.min_stock ?? 0);
 
         return {
@@ -174,7 +174,7 @@ export default function Chatbot() {
     }).format(Number(value || 0));
 
   const getStockLabel = (product) => {
-    const stock = Number(product.current_stock ?? product.stock ?? 0);
+    const stock = Number(product.current_stock ?? 0);
     const minStock = Number(product.min_stock ?? 0);
 
     if (stock <= 0) return "Agotado";
