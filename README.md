@@ -299,13 +299,13 @@ Ejecuta ESLint sobre el proyecto.
 
 ## Notas importantes
 
-- El checkout esta disenado solo para retiro en tienda.
+- El checkout esta diseñado solo para retiro en tienda.
 - No hay delivery ni envio a domicilio implementado.
 - La sesion del usuario se guarda en `localStorage` bajo la clave `session`.
 - Los favoritos se guardan en `localStorage` bajo la clave `favorites`.
 - Los ajustes de accesibilidad se guardan en `localStorage` bajo la clave `elupina-accessibility-settings`.
 - El contenido editable de Sobre Nosotros se guarda localmente bajo la clave `ferreteria_elupina_about_content`.
-- El servicio al cliente usa `http://localhost:3000/api/customer-service`, por lo que requiere un backend separado si se desea activar ese envio.
+- La web esta aloja en Vercel para poder estar activa al momento de usarla, ya que este sitio es gratis para cualquier deploy
 
 ## Autor
 
