@@ -1,0 +1,301 @@
+
+drop function insert_user;
+-- Insert User in user_profiles
+CREATE OR REPLACE FUNCTION insert_user(
+  p_full_name text,
+  p_email text,
+  p_password_hash text
+)
+RETURNS user_profiles
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_user user_profiles;
+BEGIN
+
+  INSERT INTO user_profiles (
+    full_name,
+    internal_email,
+    password_hash,
+    role_id,
+    is_active
+  )
+  VALUES (
+    p_full_name,
+    p_email,
+    crypt(p_password_hash, gen_salt('bf')), -- bcrypt,
+    3,
+    true
+  )
+
+
+  RETURNING * INTO new_user;
+
+  RETURN new_user;
+END;
+$$;
+
+
+drop function insert_product;
+--Insert Producto
+CREATE OR REPLACE FUNCTION insert_product(
+  p_name text,
+  p_description text,
+  p_supplier_id int,
+  p_cost numeric,
+  p_sale numeric,
+  p_stock int,
+  p_min int,
+  p_status text,
+  p_image_url text,
+  p_department_id int4
+)
+RETURNS products
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_product products;
+BEGIN
+  PERFORM check_supplier_exists(p_supplier_id);
+
+  INSERT INTO products (
+    name,
+    description,
+    supplier_id,
+    cost_price,
+    sale_price,
+    current_stock,
+    min_stock,
+    status,
+    image_url,
+    department_id
+  )
+  VALUES (
+    p_name,
+    p_description,
+    p_supplier_id,
+    p_cost,
+    p_sale,
+    p_stock,
+    p_min,
+    p_status,
+    p_image_url,
+    p_department_id
+  )
+  RETURNING * INTO new_product;
+
+  RETURN new_product;
+END;
+$$;
+
+--Insert Supplier
+CREATE OR REPLACE FUNCTION insert_suppliers (
+  p_name text,
+  p_phone text,
+  p_email text,
+  p_address text
+)
+RETURNS suppliers
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_supplier suppliers;
+BEGIN 
+  INSERT INTO suppliers (
+    name,
+    phone,
+    email,
+    address,
+    is_active
+  )
+  VALUES (
+    p_name,
+    p_phone,
+    p_email,
+    p_address,
+    true
+  )
+  RETURNING * INTO new_supplier;
+  RETURN new_supplier;
+END;
+$$
+
+
+drop function insert_inventory_movement;
+--Insert Inventory Movement
+CREATE OR REPLACE FUNCTION insert_inventory_movement(
+  p_product_id INT,
+  p_user_id INT,
+  p_movement_type TEXT,
+  p_quantity NUMERIC,
+  p_reference TEXT DEFAULT NULL,
+  p_notes TEXT DEFAULT NULL
+)
+RETURNS VOID AS $$
+DECLARE
+  current_stock_val NUMERIC;
+  min_stock_val NUMERIC;
+BEGIN
+
+  SELECT current_stock INTO current_stock_val
+  FROM products
+  WHERE product_id = p_product_id
+  FOR UPDATE;
+
+  IF p_movement_type = 'SALIDA' THEN
+    PERFORM check_stock_available(p_product_id, p_quantity);
+  END IF;
+
+  INSERT INTO inventory_movements (
+    product_id,
+    user_id,
+    movement_type,
+    quantity,
+    reference,
+    notes,
+    movement_date
+  )
+  VALUES (
+    p_product_id,
+    p_user_id,
+    p_movement_type,
+    p_quantity,
+    p_reference,
+    p_notes,
+    NOW()
+  );
+
+  --  Apply stock change
+  IF p_movement_type = 'ENTRADA' THEN
+    UPDATE products
+    SET current_stock = current_stock + p_quantity
+    WHERE product_id = p_product_id;
+
+  ELSIF p_movement_type = 'SALIDA' THEN
+    UPDATE products
+    SET current_stock = current_stock - p_quantity
+    WHERE product_id = p_product_id;
+  END IF;
+
+  SELECT current_stock, min_stock INTO current_stock_val, min_stock_val
+  FROM products
+  WHERE product_id = p_product_id;
+
+  perform upsert_stock_alert(p_product_id,'Min Stock', min_stock_val, current_stock_val);
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+drop function insert_orders;
+--Insert Orders
+CREATE OR REPLACE FUNCTION insert_orders(
+  p_customer_id INT4,
+  p_created_by_user_id INT4,
+  p_order_type TEXT,
+  p_sub_total NUMERIC,  
+  p_tax NUMERIC,
+  p_discount NUMERIC,
+  p_total NUMERIC
+)
+RETURNS int AS $$
+DECLARE
+ v_order_id int8;
+BEGIN
+
+  INSERT INTO orders (
+    customer_id,
+    created_by_user_id,
+    order_type,
+    order_status,
+    payment_status,
+    delivery_type,
+    subtotal,
+    tax,
+    discount,
+    total
+  )
+  VALUES (
+    p_customer_id,
+    p_created_by_user_id,
+    p_order_type,
+    'Pendiente Pick Up',
+    'Pendiente',
+    'Pick Up',
+    p_sub_total,
+    p_tax,
+    p_discount,
+    p_total
+  )
+
+  returning order_id into v_order_id;
+  
+  return v_order_id;
+
+END;
+$$ LANGUAGE plpgsql;
+
+drop function insert_orders_items;
+--Insert Orders Items
+CREATE OR REPLACE FUNCTION insert_orders_items(
+  p_order_id INT4,
+  p_product_id INT4,
+  p_quantity numeric,
+  p_unit_price numeric,
+  p_discount numeric,  
+  p_line_total numeric,
+  p_user_id int
+)
+RETURNS VOID AS $$
+BEGIN
+
+  INSERT INTO orders_items (
+    order_id,
+    product_id,
+    quantity,
+    unit_price,
+    discount,
+    line_total
+  )
+  VALUES (
+    p_order_id,
+    p_product_id,
+    p_quantity,
+    p_unit_price,
+    p_discount,
+    p_line_total
+  );
+
+  perform insert_inventory_movement(p_product_id, p_user_id, 'SALIDA', p_quantity,'Venta Cliente', 'Venta');
+
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+drop function insert_department;
+--Insert Departement
+CREATE OR REPLACE FUNCTION insert_department(
+  p_name text,
+  p_image_url text
+)
+RETURNS deparments
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_department deparments;
+BEGIN
+
+  INSERT INTO deparments (
+    name,
+    department_url
+  )
+  VALUES (
+    p_name,
+    p_image_url
+  )
+  RETURNING * INTO new_department;
+
+  RETURN new_department;
+END;
+$$;

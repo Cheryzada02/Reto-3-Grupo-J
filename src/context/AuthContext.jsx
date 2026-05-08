@@ -6,7 +6,6 @@ export function AuthProvider({ children }) {
 
   const [user, setUser] = useState(null);
 
-  // Load from localStorage on app start
   useEffect(() => {
     const storedUser = localStorage.getItem("session");
     if (storedUser) {

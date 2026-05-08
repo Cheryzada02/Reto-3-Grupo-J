@@ -1,0 +1,145 @@
+import nodemailer from "npm:nodemailer@6.9.16";
+
+const cors_headers = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+type EmailAttachment = {
+  filename: string;
+  content_type: string;
+  base64: string;
+};
+
+type EmailPayload = {
+  to: string;
+  subject: string;
+  message: string;
+  html?: boolean;
+  attachments?: EmailAttachment[];
+};
+
+function base64_to_uint8_array(base64: string) {
+  const clean_base64 = base64.includes(",")
+    ? base64.split(",")[1]
+    : base64;
+
+  const binary_string = atob(clean_base64);
+  const bytes = new Uint8Array(binary_string.length);
+
+  for (let i = 0; i < binary_string.length; i++) {
+    bytes[i] = binary_string.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
+Deno.serve(async (req) => {
+  try {
+    if (req.method === "OPTIONS") {
+      return new Response("ok", {
+        headers: cors_headers,
+      });
+    }
+
+    if (req.method !== "POST") {
+      return new Response(
+        JSON.stringify({
+          error: "Method not allowed",
+        }),
+        {
+          status: 405,
+          headers: {
+            ...cors_headers,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
+
+    const {
+      to,
+      subject,
+      message,
+      html = true,
+      attachments = [],
+    } = await req.json() as EmailPayload;
+
+    if (!to || !subject || !message) {
+      return new Response(
+        JSON.stringify({
+          error: "Missing required fields: to, subject, message",
+        }),
+        {
+          status: 400,
+          headers: {
+            ...cors_headers,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+    }
+
+    const username = Deno.env.get("GMAIL_USERNAME");
+    const app_password = Deno.env.get("GMAIL_APP_PASSWORD");
+
+    if (!username) throw new Error("Missing GMAIL_USERNAME");
+    if (!app_password) throw new Error("Missing GMAIL_APP_PASSWORD");
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: username,
+        pass: app_password,
+      },
+    });
+
+    const formatted_attachments = attachments.map((attachment) => ({
+      filename: attachment.filename,
+      content: base64_to_uint8_array(attachment.base64),
+      contentType: attachment.content_type,
+    }));
+
+    const info = await transporter.sendMail({
+      from: username,
+      to,
+      subject,
+      text: html ? undefined : message,
+      html: html ? message : undefined,
+      attachments: formatted_attachments,
+    });
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: "Email sent successfully",
+        message_id: info.messageId,
+      }),
+      {
+        status: 200,
+        headers: {
+          ...cors_headers,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  } catch (error) {
+    console.error("Send email error:", error);
+
+    return new Response(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: {
+          ...cors_headers,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  }
+});

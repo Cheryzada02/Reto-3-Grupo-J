@@ -1,0 +1,17 @@
+CREATE POLICY "Allow uploads"
+ON storage.objects
+FOR INSERT
+TO public
+WITH CHECK (bucket_id = 'ferreteriard-images');
+
+CREATE POLICY "Allow public read"
+ON storage.objects
+FOR SELECT
+TO public
+USING (bucket_id = 'ferreteriard-images');
+
+CREATE POLICY "Allow delete"
+ON storage.objects
+FOR DELETE
+TO public
+USING (bucket_id = 'ferreteriard-images');

@@ -1,0 +1,119 @@
+create or replace function set_update_at ()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_user_profiles_update_at on products;
+
+-- user_profiles
+CREATE TRIGGER trg_user_profiles_updated_at
+BEFORE UPDATE ON user_profiles
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- suppliers
+CREATE TRIGGER trg_suppliers_updated_at
+BEFORE UPDATE ON suppliers
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- products
+CREATE TRIGGER trg_products_updated_at
+BEFORE UPDATE ON products
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- inventory_movements
+CREATE TRIGGER trg_inventory_updated_at
+BEFORE UPDATE ON inventory_movements
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- customers
+CREATE TRIGGER trg_customers_updated_at
+BEFORE UPDATE ON customers
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- orders
+CREATE TRIGGER trg_orders_updated_at
+BEFORE UPDATE ON orders
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- orders_items
+CREATE TRIGGER trg_orders_items_updated_at
+BEFORE UPDATE ON orders_items
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- departments
+CREATE TRIGGER trg_departments_updated_at
+BEFORE UPDATE ON deparments
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- stock alers
+CREATE TRIGGER trg_stock_alerts_updated_at
+BEFORE UPDATE ON stock_alerts
+FOR EACH ROW
+EXECUTE FUNCTION set_update_at();
+
+-- Function to run when Adding a Inventary Movement
+CREATE OR REPLACE FUNCTION apply_inventory_movement()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.movement_type = 'ENTRADA' THEN
+    UPDATE products
+    SET current_stock = current_stock + NEW.quantity
+    WHERE product_id = NEW.product_id;
+
+  ELSIF NEW.movement_type = 'SALIDA' THEN
+    UPDATE products
+    SET current_stock = current_stock - NEW.quantity
+    WHERE product_id = NEW.product_id;
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- trigger_when_adding_Inventories
+CREATE TRIGGER trg_apply_inventory
+AFTER INSERT ON inventory_movements
+FOR EACH ROW
+EXECUTE FUNCTION apply_inventory_movement();
+
+
+-- Function to Run when inserting into user_profiles
+CREATE OR REPLACE FUNCTION after_user_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+  INSERT INTO customers (
+    user_id,
+    full_name,
+    status
+    )
+  VALUES (
+    NEW.user_id,
+    NEW.full_name,
+    'Active'
+    );
+
+  RETURN NEW;
+END;
+$$;
+
+-- trigger_when_inserting_into_user
+CREATE TRIGGER trg_after_user_insert
+AFTER INSERT ON user_profiles
+FOR EACH ROW
+EXECUTE FUNCTION after_user_insert();

@@ -1,0 +1,300 @@
+--Update Supplier
+CREATE OR REPLACE FUNCTION update_suppliers (
+  p_id int4,
+  p_name text,
+  p_phone text,
+  p_email text,
+  p_address text,
+  p_is_active boolean
+)
+RETURNS suppliers
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_supplier suppliers;
+BEGIN 
+  UPDATE suppliers
+  SET 
+    name = p_name,
+    phone = p_phone,
+    email = p_email,
+    address = p_address,
+    is_active = p_is_active
+  WHERE
+    supplier_id = p_id
+    
+  RETURNING * INTO new_supplier;
+  RETURN new_supplier;
+END;
+$$
+
+
+--Update Producto
+CREATE OR REPLACE FUNCTION update_product(
+  p_id int8,
+  p_name text,
+  p_description text,
+  p_supplier_id int,
+  p_cost numeric,
+  p_sale numeric,
+  p_stock int,
+  p_min int,
+  p_status text,
+  p_image_url text
+)
+RETURNS products
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_product products;
+BEGIN
+  
+  UPDATE products
+  SET
+    name = p_name,
+    description = p_description,
+    supplier_id = p_supplier_id,
+    cost_price = p_cost,
+    sale_price = p_sale,
+    current_stock = p_stock,
+    min_stock = p_min,
+    status = p_status,
+    image_url = p_image_url
+  WHERE
+    product_id = p_id
+
+
+  RETURNING * INTO new_product;
+
+  RETURN new_product;
+END;
+$$;
+
+drop function handle_stock_drop;
+-- Handle Stock
+CREATE OR REPLACE FUNCTION handle_stock_drop(
+  p_product_id int4,
+  p_alert_type text,
+  p_thershold_value numeric,
+  p_current_value numeric
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+  -- Only insert if NO active alert exists
+  IF NOT EXISTS (
+    SELECT 1
+    FROM stock_alerts
+    WHERE product_id = p_product_id
+      AND is_resolved = 'NO'
+  ) THEN
+
+    INSERT INTO stock_alerts (
+      product_id,
+      alert_type,
+      thershold_value,
+      current_value,
+      is_resolved
+    )
+    VALUES (
+      p_product_id,
+      p_alert_type,
+      p_thershold_value,
+      p_current_value,
+      'NO'
+    );
+
+  END IF;
+
+END;
+$$;
+
+drop function resolve_stock_alerts;
+-- Resolve Stock
+CREATE OR REPLACE FUNCTION resolve_stock_alerts(
+  p_product_id int4,
+  p_current_value numeric
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+  UPDATE stock_alerts
+  SET
+    is_resolved = 'YES',
+    current_value = p_current_value
+  WHERE product_id = p_product_id
+    AND is_resolved = 'NO';
+
+END;
+$$;
+
+-- Final Stock Processing
+drop function upsert_stock_alert;
+CREATE OR REPLACE FUNCTION upsert_stock_alert(
+  p_product_id int4,
+  p_alert_type text,
+  p_thershold_value numeric,
+  p_current_value numeric
+)
+RETURNS void
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+  IF p_current_value <= p_thershold_value THEN
+    PERFORM handle_stock_drop(
+      p_product_id,
+      p_alert_type,
+      p_thershold_value,
+      p_current_value
+    );
+  ELSE
+    PERFORM resolve_stock_alerts(
+      p_product_id,
+      p_current_value
+    );
+  END IF;
+
+END;
+$$;
+
+drop function update_department;
+--Update Department
+CREATE OR REPLACE FUNCTION update_department(
+  p_id int4,
+  p_name text,
+  p_image_url text
+)
+RETURNS deparments
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_deparments deparments;
+BEGIN
+  
+  UPDATE deparments
+  SET
+    name = p_name,
+    department_url = p_image_url
+  WHERE
+    department_id = p_id
+
+  RETURNING * INTO new_deparments;
+
+  RETURN new_deparments;
+END;
+$$;
+
+
+drop function update_customers;
+--Update update_customers
+CREATE OR REPLACE FUNCTION update_customers(
+  p_customer_id int4,
+  p_full_name text,
+  p_phone text,
+  p_email text,
+  p_address text,
+  p_image_url text default null
+)
+RETURNS customers
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  updated_customer customers;
+BEGIN
+
+  UPDATE customers
+  SET
+    full_name = p_full_name,
+    phone = p_phone,
+    email = p_email,
+    address = p_address,
+    image_url = p_image_url
+  WHERE
+    customer_id = p_customer_id
+  RETURNING * INTO updated_customer;
+
+  RETURN updated_customer;
+
+END;
+$$;
+
+drop function update_product;
+--Update Producto
+CREATE OR REPLACE FUNCTION update_product(
+  p_id int8,
+  p_name text,
+  p_description text,
+  p_supplier_id int,
+  p_cost numeric,
+  p_sale numeric,
+  p_stock int,
+  p_min int,
+  p_status text,
+  p_image_url text,
+  p_department_id int4
+)
+RETURNS products
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  new_product products;
+BEGIN
+  
+  UPDATE products
+  SET
+    name = p_name,
+    description = p_description,
+    supplier_id = p_supplier_id,
+    cost_price = p_cost,
+    sale_price = p_sale,
+    current_stock = p_stock,
+    min_stock = p_min,
+    status = p_status,
+    image_url = p_image_url,
+    department_id = p_department_id
+  WHERE
+    product_id = p_id
+
+
+  RETURNING * INTO new_product;
+
+  RETURN new_product;
+END;
+$$;
+
+drop function update_user_profiles;
+-- update user alerts email
+create or replace function update_user_profiles(
+  p_user_id int4,
+  p_email text
+)
+returns void
+language plpgsql
+as $$
+begin
+  update user_profiles
+  set
+    alerts_email = p_email
+  where user_id = p_user_id;
+end;
+$$;
+
+-- Update user password
+create or replace function update_user_password(
+  p_user_id int,
+  p_new_password text
+)
+returns void
+language plpgsql
+as $$
+begin
+  update user_profiles
+  set password_hash = crypt(p_new_password, gen_salt('bf'))
+  where user_id = p_user_id;
+end;
+$$;

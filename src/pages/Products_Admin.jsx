@@ -6,6 +6,9 @@ import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
 import { PencilIcon, PlusIcon, Search } from "lucide-react";
 
+// =======================
+// Products Card
+// =======================
 function Product_card({ product, on_edit }) {
 
   const formatCurrency = (value) => {
@@ -58,7 +61,9 @@ function Product_card({ product, on_edit }) {
   );
 }
 
-
+// =======================
+// Products List
+// =======================
 function Product_List ({products, on_edit, columnas, emptyText }) {
   if (!products.length) return <p className="estado">{emptyText}</p>;
 
@@ -75,6 +80,9 @@ function Product_List ({products, on_edit, columnas, emptyText }) {
   );
 }
 
+// =======================
+// Modal
+// =======================
 function Product_Form({ product, on_save, on_close }) {
   const { showAlert } = useAlerts();
 
@@ -262,6 +270,9 @@ function Product_Form({ product, on_save, on_close }) {
   );
 }
 
+// =======================
+// MAIN PAGE
+// =======================
 export default function Products_page() {
   const [products, set_products] = useState([]);
   const [selected_product, set_selected_product] = useState(null);

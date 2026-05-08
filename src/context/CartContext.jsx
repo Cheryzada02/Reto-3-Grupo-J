@@ -51,7 +51,7 @@ export function CartProvider({ children }) {
     setCartItems([]);
   };
 
-  // TOTAL DINERO
+
   const cartTotal = cartItems.reduce(
     (total, item) =>
       total + Number(item.sale_price || 0) * item.quantity,

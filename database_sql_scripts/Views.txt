@@ -1,0 +1,156 @@
+-- View suppliers
+CREATE VIEW view_suppliers AS 
+SELECT * FROM suppliers;
+
+drop view view_suppliers;
+
+drop view view_products;
+-- View Products
+CREATE OR REPLACE VIEW view_products AS
+SELECT 
+  prod.product_id, 
+  prod.name as product_name,
+  prod.description, 
+  prod.supplier_id,
+  supp.name as supplier_name, 
+  prod.cost_price,
+  prod.sale_price,
+  prod.current_stock,
+  prod.min_stock,
+  prod.status,
+  prod.image_url,
+  dept.department_id,
+  dept.name as department_name
+FROM products prod
+left outer join suppliers supp
+on prod.supplier_id = supp.supplier_id
+left outer join deparments dept
+on prod.department_id = dept.department_id 
+order by prod.name asc;
+
+select * from view_products;
+
+drop view view_inventory_movements;
+-- View Inventory Movements
+CREATE OR REPLACE VIEW view_inventory_movements AS
+SELECT
+  inv_mo.movement_id,
+  prod.name as product_name,
+  usr.full_name as user_name,
+  usr.internal_email as user_email,
+  inv_mo.movement_type,
+  inv_mo.quantity,
+  inv_mo.reference,
+  inv_mo.notes,
+  inv_mo.updated_at
+
+FROM inventory_movements inv_mo
+left outer join products prod
+on prod.product_id = inv_mo.product_id
+left outer join user_profiles usr
+on usr.user_id = inv_mo.user_id
+order by movement_id desc;
+
+-- View To See Customers
+drop view view_customers;
+CREATE OR REPLACE VIEW view_customers AS
+SELECT 
+  cust.customer_id,
+  cust.user_id, 
+  cust.full_name,
+  cust.phone,
+  cust.email,
+  cust.address,
+  cust.last_login,
+  cust.image_url,
+  usr.internal_email
+FROM customers cust
+left outer join user_profiles usr
+on cust.user_id = usr.user_id;
+
+-- View To See Departments
+drop view view_departments;
+CREATE VIEW view_departments AS 
+SELECT 
+  department_id,
+  name as department_name,
+  department_url
+FROM deparments
+order by department_name asc;
+
+-- View To See Stock Alerts
+drop view view_stock_alerts;
+CREATE VIEW view_stock_alerts AS 
+SELECT 
+  stc_al.alert_id,
+  stc_al.product_id,
+  prod.name as product_name,
+  stc_al.alert_type,
+  stc_al.thershold_value,
+  stc_al.current_value,
+  stc_al.is_resolved,
+  stc_al.created_at,
+  stc_al.updated_at
+FROM stock_alerts stc_al
+left outer join products prod
+on prod.product_id = stc_al.product_id
+
+-- View To See Orders
+drop view view_orders;
+CREATE VIEW view_orders AS 
+SELECT 
+  ord.order_id,
+  ord.customer_id,
+  custo.full_name as customer_name,
+  ord.created_by_user_id as create_by,
+  usr_pro.full_name as create_by_name,
+  ord.order_type,
+  ord.order_status,
+  ord.payment_status,
+  ord.delivery_type,
+  ord.subtotal,
+  ord.tax,
+  ord.discount,
+  ord.total,
+  ord.created_at,
+  ord.updated_at
+FROM orders ord
+left outer join customers custo
+on ord.customer_id = custo.customer_id
+left outer join user_profiles usr_pro
+on ord.created_by_user_id = usr_pro.user_id
+order by ord.order_id asc;
+
+-- View To See Orders Deatils
+drop view view_orders_details;
+CREATE VIEW view_orders_details AS 
+SELECT 
+  ord_item.order_item_id,
+  ord.order_id,
+  ord.order_status,
+  ord_item.product_id,
+  prod.name as product_name,
+  ord_item.quantity,
+  ord_item.unit_price,
+  ord_item.discount,
+  ord_item.line_total,
+  ord_item.created_at,
+  ord_item.updated_at
+FROM orders_items ord_item
+left outer join orders ord
+on ord_item.order_id = ord.order_id
+left outer join products prod
+on ord_item.product_id = prod.product_id
+order by ord_item.order_item_id asc;
+
+
+
+--View to see User Profiles
+drop view view_user_profiles;
+CREATE VIEW view_user_profiles AS 
+SELECT
+  user_pr.user_id,
+  user_pr.full_name,
+  user_pr.internal_email,
+  user_pr.alerts_email
+FROM user_profiles user_pr;

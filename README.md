@@ -179,6 +179,7 @@ Carpetas adicionales:
 - `public/`: favicon, logo e iconos.
 - `Planificacion/`: documentos de planificacion y base de datos.
 - `Evidencias/`: capturas y fotografias del proceso.
+- `database_sql_scripts/`: scripts SQL para la creacion de la base de datos.
 
 ## Conexion con Supabase
 

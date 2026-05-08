@@ -1,0 +1,95 @@
+insert into roles (name, description) values ('admin', 'Acceso total al app, permisos de insertar, actualizar, borrar.');
+insert into roles (name, description) values ('worker', 'Permiso solo de visualizar sin modificar valores de configuracion');
+insert into roles (name, description) values ('client', 'Permiso solo de visualizar dentro de su propio usuario.');
+
+insert into user_profiles (full_name, internal_email, password_hash, role_id, is_active) values ('Raykel', 'raykelvillar@ferreteriard.com', 'test', 1, true);
+update user_profiles set full_name = 'Raykel Villar' where user_id = 1;
+
+
+delete from user_profiles where user_id = 22;
+
+create extension if not exists pgcrypto;
+
+select * from suppliers;
+delete from suppliers where supplier_id = 2;
+
+insert into suppliers (name, phone, email, address, is_active) values ('Distribuidora Corripio', 8297588569, 'corripio@gmail.com', 'calle nicolas ferreira, numero 2', true);
+
+select * from roles;
+select * from user_profiles;
+SELECT * FROM suppliers; 
+SELECT * FROM products; 
+SELECT * FROM inventory_movements;
+SELECT * FROM customers;
+SELECT * FROM view_departments;
+SELECT * FROM orders;
+SELECT * FROM orders_items;
+SELECT * FROM stock_alerts;
+
+update user_profiles set role_id = 3 where user_id = 39;
+
+update products set name = 'Juego de baño 3pz 24.5*22*8.5' where product_id = 19;
+delete from products where product_id between 6 and 100;
+
+select * from orders where customer_id = 4;
+
+select * from view_orders_details;
+
+delete from suppliers where supplier_id between 1 and 13
+
+delete from orders;
+
+
+
+
+update user_profiles set internal_email = 'raykelvillar@ferreteriaelupina.com' where user_id = 11;
+update user_profiles set role_id = 1 where user_id = 24;
+delete from user_profiles where user_id = 21;
+
+update products set department_id = 2 where product_id = 2;
+update products set department_id = 2 where product_id = 3;
+
+INSERT INTO deparments (name) VALUES ('Pisos y Terminaciones');
+INSERT INTO deparments (name) VALUES ('Automotriz');
+INSERT INTO deparments (name) VALUES ('Baños y Grifería');
+INSERT INTO deparments (name) VALUES ('Cerrajería');
+INSERT INTO deparments (name) VALUES ('Electricidad');
+INSERT INTO deparments (name) VALUES ('Herramientas');
+INSERT INTO deparments (name) VALUES ('Iluminación');
+INSERT INTO deparments (name) VALUES ('Herrería');
+INSERT INTO deparments (name) VALUES ('Hogar y decoración');
+INSERT INTO deparments (name) VALUES ('Jardinería');
+INSERT INTO deparments (name) VALUES ('Maquinarias');
+INSERT INTO deparments (name) VALUES ('Materiales de construcción');
+INSERT INTO deparments (name) VALUES ('Pinturas');
+INSERT INTO deparments (name) VALUES ('Plomería');
+INSERT INTO deparments (name) VALUES ('Seguridad industrial');
+INSERT INTO deparments (name) VALUES ('Tornillos');
+INSERT INTO deparments (name) VALUES ('Ventilación');
+
+insert into inventory_movements (product_id, user_id, movement_type, quantity, movement_date) values (1, 11, 'ENTRADA', 5, '2026-04-30');
+
+alter table inventory_movements
+
+select * from inventory_movements;
+
+delete from inventory_movements where movement_id = 8;
+
+delete from products where product_id = 4;
+
+update products set image_url = null where product_id = 3;
+
+SELECT *
+FROM view_customers
+WHERE user_id = 23;
+
+delete from deparments where name = 'test';
+
+alter table user_profiles
+drop column marketing_email;
+
+delete from inventory_movements where movement_type = 'Salida';
+delete from orders where order_id = 35;
+delete from orders_items where order_id = 35;
+
+select * from orders_items;

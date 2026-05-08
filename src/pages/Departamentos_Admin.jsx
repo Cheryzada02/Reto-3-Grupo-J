@@ -6,6 +6,9 @@ import { useAuth } from  "../context/AuthContext";
 import { useAlerts } from "../context/AlertContext";
 import { PencilIcon, PlusIcon } from "lucide-react";
 
+// =======================
+// Department Card
+// =======================
 function Department_card({ department, on_edit }) {
 
   const formatCurrency = (value) => {
@@ -42,7 +45,9 @@ function Department_card({ department, on_edit }) {
   );
 }
 
-
+// =======================
+// Department List
+// =======================
 function Department_List ({departments, on_edit }) {
   if (!departments.length) return <p>Cargando departamentos...</p>;
 
@@ -161,6 +166,9 @@ function Department_Form({ department, on_save, on_close }) {
   );
 }
 
+// =======================
+// MAIN PAGE
+// =======================
 export default function Departments_page() {
   const [departments, set_departments] = useState([]);
   const [selected_department, set_selected_department] = useState(null);
